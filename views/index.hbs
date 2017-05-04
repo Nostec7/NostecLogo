@@ -1,0 +1,50 @@
+<form action="/" method="post">
+    <!-- text area for code input element -->
+    <div><div><textarea readonly id="enteredCode" rows="30" cols="30"
+                        style="width:20%; height:48%; font-size:100%;
+              position: absolute; left: 50px; top:100px; resize:none" placeholder="Previous code..."></textarea>
+
+        <!-- History box for the entered commands -->
+        <textarea id="inputCode" rows="30" cols="30"
+                  style="width:20%; height:30%; font-size:100%;
+              position: absolute; left: 50px; bottom:92px; resize:none" placeholder="Enter your code..."></textarea>
+
+        <!-- button element -->
+        <button type="button" id="topButton"
+                style="font-size:150%; width:20.3%; height: 50px;
+                position: absolute; top:50px; left: 50px;" onclick="javascript:nullText()">Clear history</button>
+                <script type="text/javascript">
+                    function nullText() {
+                        document.getElementById('enteredCode').value = "";
+                    }
+                </script>
+        <button type="button" id="runButton"
+                style="font-size:150%; width:20.3%; height: 50px;
+                position: absolute; bottom:45px; left: 50px;" onclick="javascript:getText()">RUN
+            <script type="text/javascript" src="./javascripts/ajlogo.js" ></script>
+            <script type="text/javascript" src="./javascripts/runButton.js">
+            </script>
+            <!--<script type="text/javascript" src="./javascripts/runButton.js"></script>-->
+        </button>
+    </div>
+
+        <div style="position: absolute; right:50px; top:50px;" >
+
+            <!-- UPLOAD IMAGES FOR CANVAS HERE -->
+            <img id="turtle" width="0" height="0"
+                 src="./images/turtle.png">
+
+            <!-- CANVAS -->
+            <canvas id="drawingCanvas" onresize="resize_canvas()"
+                    style="border:1px solid white; background-color:white">
+
+                <canvas id="imagingCanvas">
+                <!-- canvas element for drawing (canvas rescale su js) -->
+                <script type="text/javascript" src="./javascripts/resizeCanvas.js"></script>
+                <script type="text/javascript" src="./javascripts/drawOnCanvas.js"></script>
+
+                </canvas>
+            </canvas>
+        </div></div>
+</form>
+
