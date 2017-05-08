@@ -22,10 +22,9 @@ function domloaded(){
         var centerX = canvas.width / 2;
         var centerY = canvas.height / 2;
 
-        lineColor = "#000000";
         lineWidth = logoLineWidth;
 
-        ctx.strokeStyle = lineColor;
+        ctx.strokeStyle = "#" + logoLineColor;
         ctx.lineJoin = "round";
         ctx.lineWidth = lineWidth;
 
@@ -66,7 +65,7 @@ function domloaded(){
             lineStartingPossY.push(startingPosY);
             lineEndingPossX.push(endingPosX);
             lineEndingPossY.push(endingPosY);
-            lineColors.push(lineColor);
+            lineColors.push("#" + logoLineColor);
             //lineWidths.push(lineWidth);
 
         };
@@ -103,16 +102,16 @@ function domloaded(){
             }
             //drawLine(0,100,200,400, "#ff0000", 2); // pvz
 
-            function drawRectangle(x,y,width,height, fillColor, strokeColor, strokeWidth){
+            /*function drawRectangle(x,y,width,height, fillColor, strokeColor, strokeWidth){
                 ctx.fillStyle = fillColor;
                 ctx.strokeStyle = strokeColor;
                 ctx.strokeWidth = strokeWidth;
                 ctx.fillRect(x, y, width, height);
                 ctx.strokeRect(x, y, width, height);
-            }
+            }*/
             //drawRectangle(0,0,50,90,"#ff0000", "#ffffff", 1); // pvz
 
-            function drawCircle(x, y, radius, fillColor, strokeColor, strokeWidth){
+            /*function drawCircle(x, y, radius, fillColor, strokeColor, strokeWidth){
                 //draw circle
                 ctx.beginPath();
                 ctx.arc(x,y,radius,0,2*Math.PI);
@@ -121,7 +120,7 @@ function domloaded(){
                 ctx.strokeStyle = strokeColor;
                 ctx.strokeWidth = strokeWidth;
                 ctx.stroke();
-            }
+            }*/
             //drawCircle(centerX, centerY, 20, "#555555", "#0000ff", 1); // pvz
 
             function drawText(x, y, text, fontSize, fontName, fillColor, strokeColor, strokeWidth){
@@ -133,7 +132,14 @@ function domloaded(){
                 ctx.strokeWidth = strokeWidth;
                 ctx.strokeText(text, x, y);
             }
-            //drawText(300,100,"Hello world", "30", "Arial", "#000000", "#00ff00", 1); // pvz
+
+            /*if(!textDisplayList.empty()){
+                for(var i = 0; i < textDisplayList.length; i++){
+                    drawText(centerX,centerY,"\"" + textDisplayList[i] + "\"", "30", "Arial", "#000000", "#000000", 1); // pvz
+                }
+            }*/
+
+            //drawText(centerX,centerY,"Hello world", "30", "Arial", "#000000", "#000000", 1); // pvz
 
             function loadImage(imageID, positionX, positionY, rotation, width, height){
                 var img = document.getElementById(imageID);

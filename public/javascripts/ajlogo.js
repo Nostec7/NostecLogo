@@ -6,17 +6,21 @@
 var english = ['forward', 'fw', 'backwards', 'bw', 'left', 'lt', 'right', 'rt', 'home',
 				'clearscreen', 'clrscr', 'repeat', 'penup', 'pu', 'pendown', 'pd',
 				'end', 'to', 'fotward.width', 'fw.width', 'backwards.width', 'bw.width',
-    			'choose.pen.width', 'cpw'];
+    			'choose.pen.width', 'cpw', 'choose.pen.color', 'cpc'];
 var lietuviu = ['pirmyn', 'pr', 'atgal', 'at', 'kairėn', 'kr','dešinėn', 'dš', 'namo',
 				'valyk.vežliuko.lauką', 'vvl', 'kartok', 'eisim', 'es', 'piešim', 'pš',
 				'taškas', 'tai', 'priekin.storiu', 'pr.storiu', 'atgal.storiu', 'at.storiu',
-				'pasirink.pieštuko.storį', 'pps'];
+				'pasirink.pieštuko.storį', 'pps', 'pasirink.pieštuko.spalvą', 'ppsp'];
 var vocabulary = lietuviu;
 
 
 
 var turtleRots = 0;
 var logoLineWidth = 1;
+var logoLineColor = "000000";
+
+var textDisplayList = [];
+var textSizeList = [];
 (function(exports, module, top)
 {
 
@@ -1278,11 +1282,22 @@ var logoLineWidth = 1;
             //lineWidths.push(logoLineWidth-2);
         }
     });
+    /*topcontext.setProcedure('rasyk', function(text, size) { // rasyk teksta storiu
+		textDisplayList.push(text);
+		textSizeList.push(size);
+
+    });*/
     topcontext.setProcedure(vocabulary[22], function(width) { // pasirink.pieštuko.storį
 		logoLineWidth = width;
     });
     topcontext.setProcedure(vocabulary[23], function(width) { // pps
         logoLineWidth = width;
+    });
+    topcontext.setProcedure(vocabulary[24], function(r, g, b) { // pasirink.piestuko.spalva
+        logoLineColor = "" + r + g + b;
+    });
+    topcontext.setProcedure(vocabulary[25], function(r, g, b) { // ppsp
+        logoLineColor = "" + r + g + b;
     });
     topcontext.setProcedure(vocabulary[18], function(distance, width) { // priekin.storiu
         turtle.forward(distance);
