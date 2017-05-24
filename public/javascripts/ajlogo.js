@@ -122,16 +122,15 @@ var textSizeList = [];
 		this.list = list;
 	}
 	
-	CompositeExpression.prototype.evaluate = function(context)
-	{
+	CompositeExpression.prototype.evaluate = function(context) {
 		var ip = 0;
 		var l = this.list.length;
+
 		var self = this;
 		
 		while (ip < l)
 		{
 			var result = evaluateElement();
-			
 			if (result && result instanceof ReturnValue) 
 				return result;
 		}
@@ -451,6 +450,19 @@ var textSizeList = [];
 				
 			return new Token(name, TokenType.Variable);
 		}
+
+        function nextOperator()
+        {
+            var name = '';
+
+            while ((char = nextChar()) != null && char > ' ' && separators.indexOf(char) < 0)
+                name += char;
+
+            if (char != null)
+                position--;
+
+            return new Token(name, TokenType.Operator);
+        }
 		
 		function nextWord()
 		{
@@ -520,23 +532,21 @@ var textSizeList = [];
 		this.type = type;
 	}
 	
-	var TokenType = { Name: 0, Number:1, Separator:2, Word:3, Variable:4, Constant:5 };
+	var TokenType = { Name: 0, Number:1, Separator:2, Word:3, Variable:4, Constant:5, Operator:6};
 	
 	// Parser
 	
-	function Parser(lexer) 
-	{
+	function Parser(lexer) {
 		this.parse = parse;
 		
 		function parse(upto) {
 			var result = [];
 			
-			for (var token = lexer.nextToken(); token != null; token = lexer.nextToken())
-			{
+			for (var token = lexer.nextToken(); token != null; token = lexer.nextToken()) {
 				if (upto != null && token.type == TokenType.Separator && token.value == upto)
 					return result;
-
 				result.push(upto && upto == ']' ? parsePlainElement(token) : parseElement(token));
+                //result.push(upto && upto == ')' ? parsePlainElement(token) : parseElement(token));
 			}
 			
 			if (upto != null)
@@ -561,9 +571,13 @@ var textSizeList = [];
 				
 			if (token.type == TokenType.Variable)
 				return new VariableReference(token.value);
-				
+
+            if (token.type == TokenType.Operator)
+                return new VariableReference(token.value);
+
 			if (token.type == TokenType.Separator && token.value == '[')
 				return parse(']');
+
 		}
 		
 		function parsePlainElement(token)
@@ -582,6 +596,12 @@ var textSizeList = [];
 				
 			if (token.type == TokenType.Variable)
 				return ':' + token.value;
+
+            if (token.type == TokenType.Operator)
+                return token.value;
+
+            if (token.type == TokenType.Separator && token.value == '(')
+                return parse(')');
 
 			if (token.type == TokenType.Separator && token.value == '[')
 				return parse(']');
@@ -640,7 +660,7 @@ var textSizeList = [];
 		return x*y;
 	});
 	
-	topcontext.setProcedure('quotient', function(x, y) {
+	topcontext.setProcedure('div', function(x, y) {
 		return x/y;
 	});
 	

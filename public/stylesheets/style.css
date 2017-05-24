@@ -12,6 +12,18 @@ button {
     background-color:seagreen;
 }
 
+.cover {
+    width: 260px;
+    object-fit: cover;
+}
+
 a {
   color: #00B7FF;
+}
+
+textarea{
+    outline: none;
+}
+button {
+    outline-color: grey;
 }

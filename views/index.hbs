@@ -1,31 +1,83 @@
 <form action="/" method="post">
     <!-- text area for code input element -->
-    <div><div><textarea readonly id="enteredCode" rows="30" cols="30"
-                        style="width:20%; height:48%; font-size:100%;
-              position: absolute; left: 50px; top:100px; resize:none" placeholder="Previous code..."></textarea>
+    <div>
+        <div>
 
-        <!-- History box for the entered commands -->
-        <textarea id="inputCode" rows="30" cols="30"
-                  style="width:20%; height:30%; font-size:100%;
-              position: absolute; left: 50px; bottom:92px; resize:none" placeholder="Enter your code..."></textarea>
+            <div style="height:790px">
+                <textarea readonly id="enteredCode" rows="30" cols="30"
+                          style="width:19.9%; height:77%; font-size:100%;
+              position: relative; left: 0px; top:30px; resize:none" placeholder="Kodo istorija..."></textarea>
+
+
+                <button type="button" id="runButton"
+                        style="font-size:90%; width:80px; height: 30px;
+                position: relative; bottom:-20px; left: -85px; resize:none;" onclick="getText()" >VYKDYTI
+                    <script type="text/javascript" src="./javascripts/ajlogo.js" ></script>
+                    <script type="text/javascript" src="./javascripts/runButton.js">
+                    </script>
+                    <!--<script type="text/javascript" src="./javascripts/runButton.js"></script>-->
+                </button>
+
+                <!-- History box for the entered commands -->
+                <textArea id="inputCode"
+                          style="width:20%; height:15%; font-size:100%;
+              position: absolute; left: 50px; bottom:45px; resize:none" placeholder="Rašykite savo kodą..."></textArea>
+                <script type="text/javascript">
+
+                    document.getElementById('runButton').addEventListener("mousedown", function() {
+                        getTextFromHistory();
+                    });
+
+
+                    document.getElementById("enteredCode").addEventListener("keydown", function(e) {
+                        if (e.keyCode == 13) { // on press vykdys pasirinkta kodo dali (arba paspaudus run mygtuka)
+                            console.log(window.getSelection().toString()); // gauna pasirinkta teksta ir kai paspaudi enter ji vykdo
+                            getTextFromHistory();
+                        }
+                    }, false);
+
+
+                    document.getElementById("inputCode").addEventListener("keydown", function(e) {
+                        //if (!e) { var e = window.event; }
+
+                        // Enter is pressed
+                        if(e.shiftKey && e.keyCode == 13){
+                            console.log('shift + enter pressed');
+
+                        } else if (e.keyCode == 13) {
+                            console.log('enter key is pressed');
+                            //TODO: execute submitted command
+                            //TODO: put text to the history field
+                            //TODO: clear the input textarea
+
+
+
+
+                            getText();
+                            document.getElementById('inputCode').value = "";
+                            document.getElementById("inputCode").focus();
+
+                            if(event.preventDefault) event.preventDefault();
+                            return false;
+                        }
+                    }, false);
+                </script>
+            </div>
+
+
+
+
 
         <!-- button element -->
         <button type="button" id="topButton"
-                style="font-size:150%; width:20.3%; height: 50px;
-                position: absolute; top:50px; left: 50px;" onclick="javascript:nullText()">Clear history</button>
+                style="font-size:100%; width:20.3%; height: 30px;
+                position: absolute; top:50px; left: 50px; resize:none" onclick="javascript:nullText()">Valyti istoriją</button>
                 <script type="text/javascript">
                     function nullText() {
                         document.getElementById('enteredCode').value = "";
                     }
                 </script>
-        <button type="button" id="runButton"
-                style="font-size:150%; width:20.3%; height: 50px;
-                position: absolute; bottom:45px; left: 50px;" onclick="javascript:getText()">RUN
-            <script type="text/javascript" src="./javascripts/ajlogo.js" ></script>
-            <script type="text/javascript" src="./javascripts/runButton.js">
-            </script>
-            <!--<script type="text/javascript" src="./javascripts/runButton.js"></script>-->
-        </button>
+
     </div>
 
         <div style="position: absolute; right:50px; top:50px;" >

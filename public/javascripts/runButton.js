@@ -50,7 +50,17 @@
         var text = document.getElementById('inputCode').value;
         if (text != "") {
             logo.evaluateText(text);
+            if(document.getElementById('inputCode').value != "\n"){
+                setText(document.getElementById('inputCode').value + '\n', true);
+            }
             document.getElementById('inputCode').value = '';
+            setText(text);
+        }
+    }
+    function getTextFromHistory() {
+        var text = window.getSelection().toString();
+        if (text != "") {
+            logo.evaluateText(text);
             setText(text);
         }
     }
@@ -61,7 +71,8 @@
             document.getElementById('enteredCode').value += text;
             document.getElementById("enteredCode").scrollTop = document.getElementById("enteredCode").scrollHeight; // visada rodo apatine dali
         } else {
-            document.getElementById('enteredCode').value += text + '\n-------------\n';
             document.getElementById("enteredCode").scrollTop = document.getElementById("enteredCode").scrollHeight; // visada rodo apatine dali
         }
     }
+
+
