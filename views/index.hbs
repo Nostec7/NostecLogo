@@ -1,17 +1,17 @@
 <form action="/" method="post">
     <!-- text area for code input element -->
-    <div>
+    <div class="fullPage">
         <div>
 
-            <div style="height:790px">
-                <textarea readonly id="enteredCode" rows="30" cols="30"
-                          style="width:19.9%; height:77%; font-size:100%;
-              position: relative; left: 0px; top:30px; resize:none" placeholder="Kodo istorija..."></textarea>
+
+                <textarea readonly id="enteredCode"
+                          style="width:21%; height:70%; font-size:100%;
+              position: absolute; left: 2%; top:9%; " placeholder="Kodo istorija..."></textarea>
 
 
                 <button type="button" id="runButton"
-                        style="font-size:90%; width:80px; height: 30px;
-                position: relative; bottom:-20px; left: -85px; resize:none;" onclick="getText()" >VYKDYTI
+                        style="font-size:90%; width:7%; height: 4%;
+                position: absolute; bottom:20.5%; left: 16.3%; resize:none;" onclick="getText()" >VYKDYTI
                     <script type="text/javascript" src="./javascripts/ajlogo.js" ></script>
                     <script type="text/javascript" src="./javascripts/runButton.js">
                     </script>
@@ -20,8 +20,8 @@
 
                 <!-- History box for the entered commands -->
                 <textArea id="inputCode"
-                          style="width:20%; height:15%; font-size:100%;
-              position: absolute; left: 50px; bottom:45px; resize:none" placeholder="Rašykite savo kodą..."></textArea>
+                          style="width:21%; height:15%; font-size:100%;
+              position: absolute; left: 2%; bottom:4%; resize:none" placeholder="Rašykite savo kodą..."></textArea>
                 <script type="text/javascript">
 
                     document.getElementById('runButton').addEventListener("mousedown", function() {
@@ -46,13 +46,6 @@
 
                         } else if (e.keyCode == 13) {
                             console.log('enter key is pressed');
-                            //TODO: execute submitted command
-                            //TODO: put text to the history field
-                            //TODO: clear the input textarea
-
-
-
-
                             getText();
                             document.getElementById('inputCode').value = "";
                             document.getElementById("inputCode").focus();
@@ -67,14 +60,26 @@
 
 
 
+<!-- Slider
+
+        <form>
+            <input type="range" value="50" style="position:absolute; top:5px;"/>
+        </form>
+-->
+
+
+
 
         <!-- button element -->
         <button type="button" id="topButton"
-                style="font-size:100%; width:20.3%; height: 30px;
-                position: absolute; top:50px; left: 50px; resize:none" onclick="javascript:nullText()">Valyti istoriją</button>
+                style="font-size:90%; width:21.35%; height: 4%;
+                position: absolute; top:5%; left: 2%; resize:none" onclick="javascript:nullText()">Valyti istoriją</button>
                 <script type="text/javascript">
                     function nullText() {
                         document.getElementById('enteredCode').value = "";
+
+
+
                     }
                 </script>
 
@@ -94,9 +99,9 @@
                 <!-- canvas element for drawing (canvas rescale su js) -->
                 <script type="text/javascript" src="./javascripts/resizeCanvas.js"></script>
                 <script type="text/javascript" src="./javascripts/drawOnCanvas.js"></script>
-
                 </canvas>
             </canvas>
-        </div></div>
+        </div>
+    </div>
 </form>
 

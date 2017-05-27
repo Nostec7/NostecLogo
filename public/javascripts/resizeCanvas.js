@@ -3,6 +3,8 @@
  */
 document.addEventListener('DOMContentLoaded',domloaded,false);
 function domloaded(){
+
+
     function resize_canvas(){
     }
     canvas = document.getElementById("drawingCanvas");
