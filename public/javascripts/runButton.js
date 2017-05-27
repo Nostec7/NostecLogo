@@ -45,9 +45,11 @@
 
     //tai pavadinimas :dydis :kampas     viduje galima kreiptis dar karta (rekursiskai) tai jos viduje bus    pavadinimas :dydis + 1 :kampas
 
-
+    var historyElements = [];
+    var currentPositionInHistory = 0;
     function getText() {
         var text = document.getElementById('inputCode').value;
+        historyElements.push(text);
         if (text != "") {
             logo.evaluateText(text);
             if(document.getElementById('inputCode').value != "\n"){
@@ -56,6 +58,12 @@
             document.getElementById('inputCode').value = '';
             setText(text);
         }
+        currentPositionInHistory = historyElements.length;
+        if(currentPositionInHistory == -1){
+            currentPositionInHistory++;
+        }
+        //console.log(currentPositionInHistory);
+
     }
     function getTextFromHistory() {
         var text = window.getSelection().toString();

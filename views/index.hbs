@@ -37,22 +37,51 @@
                     }, false);
 
 
+
+
+
+
                     document.getElementById("inputCode").addEventListener("keydown", function(e) {
                         //if (!e) { var e = window.event; }
 
                         // Enter is pressed
+
+
                         if(e.shiftKey && e.keyCode == 13){
-                            console.log('shift + enter pressed');
+                            //console.log('shift + enter pressed');
 
                         } else if (e.keyCode == 13) {
-                            console.log('enter key is pressed');
+                            //console.log('enter key is pressed');
                             getText();
                             document.getElementById('inputCode').value = "";
                             document.getElementById("inputCode").focus();
 
                             if(event.preventDefault) event.preventDefault();
                             return false;
+                        } else if(e.keyCode == 38){ // up
+                            if(currentPositionInHistory > 0){
+                                currentPositionInHistory--;
+                                document.getElementById('inputCode').value = historyElements[currentPositionInHistory];
+
+                            }
+
+                        } else if(e.keyCode == 40){
+
+                            if(currentPositionInHistory >= 0 && currentPositionInHistory < historyElements.length-1){
+                                currentPositionInHistory++;
+                                document.getElementById('inputCode').value = historyElements[currentPositionInHistory];
+                            }
+
+
+
+
                         }
+
+
+
+
+
+
                     }, false);
                 </script>
             </div>
