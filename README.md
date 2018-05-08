@@ -1,0 +1,2 @@
+# NostecLogo
+NostecLogo - Bakalaurinis darbas 
