@@ -1,0 +1,88 @@
+tai trikampis :ilgis
+kr 90
+kartok 3 [dš 120 pr :ilgis]
+dš 90
+taškas
+trikampis 100
+
+tai kvadratas :ilgis
+kartok 4 [pr :ilgis dš 90]
+taškas
+kvadratas 100
+
+tai staciakampis :ilgis1 :ilgis2
+pr :ilgis1 dš 90
+pr :ilgis2 dš 90
+pr :ilgis1 dš 90
+pr :ilgis2 dš 90
+taškas
+staciakampis 100 40
+
+tai apskritimas :ilgis
+kartok 36 [pr :ilgis dš 10]
+taškas
+apskritimas 30
+
+tai daugiakampis :kampuSk :ilgis :kampas
+kartok :kampuSk [pr :ilgis dš :kampas]
+taškas
+daugiakampis 7 30 360/7
+
+tai rombas :ilgis
+dš 30
+pr :ilgis
+dš 120
+pr :ilgis
+dš 60
+pr :ilgis
+dš 120
+pr :ilgis
+dš 30
+taškas
+rombas 60
+
+tai zvaigzde :ilgis
+dš 55
+kartok 5 [pr :ilgis kr 144]
+kr 55
+taškas
+zvaigzde 80
+
+tai rodykle :ilgis
+pr :ilgis
+kr 90
+pr 10
+dš 120
+pr 30
+dš 120
+pr 30
+dš 120
+pr 10
+kr 90
+pr :ilgis
+dš 90
+pr 10
+dš 90
+taškas
+rodykle 50 
+
+tai kvadratai :length
+  kartok 4 [ pr :ilgis dš 90 ]
+taškas
+tai betkokiaspalva
+  setcolor pick [ red orange yellow green blue violet ]
+taškas
+vvl
+kartok 36 [ betkokiaspalva kvadratas bet.koks 200 dš 10 ]
+
+tai papartis :dydis :ženklas
+  jeigu :dydis < 1 [ baik ]
+  pr :dydis
+  dš 70 * :ženklas papartis :dydis * 0.5 :ženklas * -1 kr 70 * :ženklas
+  pr :dydis
+  kr 70 * :ženklas papartis :dydis * 0.5 :ženklas dš 70 * :ženklas
+  dš 7 * :ženklas papartis :dydis - 1 :ženklas kr 7 * :ženklas
+  at :dydis * 2
+taškas
+vvl es at 150 pš
+papartis 25 1

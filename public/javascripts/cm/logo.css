@@ -1,0 +1,36 @@
+
+span.cm-logo-operator {
+  font-weight: 600;
+}
+
+span.cm-logo-variable {
+  font-style: italic;
+}
+
+span.cm-logo-keyword {
+  font-weight: 600;
+  text-transform: uppercase;
+}
+span.cm-logo-word {
+}
+
+span.cm-logo-comment {
+  font-style: italic;
+}
+
+span.cm-logo-defn-start, span.cm-logo-defn-end {
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+span.cm-logo-defn-name {
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+span.cm-logo-defn-arg {
+  font-weight: 600;
+
+  font-style: italic;
+}
+

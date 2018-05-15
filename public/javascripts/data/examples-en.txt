@@ -1,0 +1,144 @@
+to star
+  repeat 5 [ fd 100 rt 144 ]
+end
+clearscreen
+star
+
+to square :length
+  repeat 4 [ fd :length rt 90 ]
+end
+to randomcolor
+  setcolor pick [ red orange yellow green blue violet ]
+end
+clearscreen
+repeat 36 [ randomcolor square random 200 rt 10 ]
+
+clearscreen window hideturtle
+repeat 144 [
+  setlabelheight repcount
+  penup
+  fd repcount * repcount / 30
+  label "Logo
+  bk repcount * repcount / 30
+  pendown
+  rt 10
+  wait 5
+]
+showturtle
+
+to tree :size
+   if :size < 5 [forward :size back :size stop]
+   forward :size/3
+   left 30 tree :size*2/3 right 30
+   forward :size/6
+   right 25 tree :size/2 left 25
+   forward :size/3
+   right 25 tree :size/2 left 25
+   forward :size/6
+   back :size
+end
+clearscreen
+tree 150
+
+to fern :size :sign
+  if :size < 1 [ stop ]
+  fd :size
+  rt 70 * :sign fern :size * 0.5 :sign * -1 lt 70 * :sign
+  fd :size
+  lt 70 * :sign fern :size * 0.5 :sign rt 70 * :sign
+  rt 7 * :sign fern :size - 1 :sign lt 7 * :sign
+  bk :size * 2
+end
+window clearscreen pu bk 150 pd
+fern 25 1
+
+cs
+to square :size
+  repeat 4 [fd :size rt 90]
+end
+make "size 240
+repeat 48 [
+  square :size
+  rt 10
+  make "size :size - 5
+]
+
+make "angle1 15
+make "angle2 30
+make "factor1 0.9
+make "factor2 0.8
+to tree :level :size
+  if :level > 0 [
+    setpensize 1 + :level / 3
+    if :level < 3 [
+      setpencolor 10
+    ]
+    if :level >= 3 [
+      setpencolor 0
+    ]
+    fd :size
+    lt :angle1
+    tree :level - 1 :size * :factor1
+    rt :angle1
+    rt :angle2
+    tree :level - 1 :size * :factor2
+    lt :angle2
+    pu bk :size pd
+  ]
+end
+cs
+window
+pu setxy 0 -200 pd
+tree 13 70
+
+make "maxlevel 13
+to tree :level :size :turn
+  if :level > 0 [
+    fd :size
+    lt :turn
+    tree :level - 1 :size * 0.9 :turn - 3
+    rt  :turn
+    rt :turn
+    tree :level - 1 :size * 0.9 :turn - 3
+    lt :turn
+    pu bk :size pd
+  ]
+end
+cs
+window
+pu setxy 0 -250 pd
+setpensize 1
+tree :maxlevel 75 25
+
+to circle :dist
+  repeat 360 [fd :dist rt 1]
+end
+TO circles :count :dist
+  repeat :count [
+    circle :dist
+    rt 360 / :count
+  ]
+end
+pd
+setpensize 2
+
+to cloud
+  setpensize 80
+  rt 90
+  fd 90
+  bk 40
+  lt 90
+  fd 30
+  penup
+  lt 90
+  fd 20
+  lt 90
+  fd 10
+  pendown
+  fd 10
+  lt 180
+end
+
+to polygon :n :s
+  repeat :n [fd :s rt 360 / :n]
+end

@@ -1,136 +1,875 @@
-<form action="/" method="post">
-    <!-- text area for code input element -->
-    <div class="fullPage">
-        <div>
+<!DOCTYPE html>
+<title data-l10n-id="title">Logo Interpreter</title>
+<meta charset="utf-8">
+
+<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=0, width=device-width">
+
+<link rel="alternate" type="application/atom+xml" href="https://github.com/inexorabletash/jslogo/commits/master.atom">
+<link rel="shortcut icon" href="favicon.ico">
+
+<script src="https://cdn.rawgit.com/inexorabletash/polyfill/v0.1.29/polyfill.min.js"></script>
+
+<!-- CodeMirror, add-ons, and Logo-specific highlighting -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/addon/runmode/runmode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/addon/display/placeholder.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/codemirror.css">
+<script src="./javascripts/cm/logo.js"></script>
+
+<link rel="stylesheet" href="./javascripts/cm/logo.css">
+
+<body class="single" onload="showStartingPage()">
 
 
-                <textarea readonly id="enteredCode"
-                          style="width:21%; height:70%; font-size:100%;
-              position: absolute; left: 2%; top:9%; " placeholder="Kodo istorija..."></textarea>
+<div id="display-panel" class="panel">
+
+    <div id="display">
+        <div class="inner">
+            <canvas id="sandbox" width="450" height="250">
+                <span data-l10n-id="no-canvas">Your browser does not support the canvas element - sorry!</span>
+            </canvas>
+            <canvas id="turtle" width="450" height="250"></canvas>
+
+            <div id="overlay"></div>
+            <div id="error"></div>
+        </div>
+    </div>
+</div>
 
 
-                <button type="button" id="runButton"
-                        style="font-size:90%; width:7%; height: 4%;
-                position: absolute; bottom:20.5%; left: 16.3%; resize:none;" onclick="getText()" >VYKDYTI
-                    <script type="text/javascript" src="./javascripts/ajlogo.js" ></script>
-                    <script type="text/javascript" src="./javascripts/runButton.js">
-                    </script>
-                    <!--<script type="text/javascript" src="./javascripts/runButton.js"></script>-->
-                </button>
-
-                <!-- History box for the entered commands -->
-                <textArea id="inputCode"
-                          style="width:21%; height:15%; font-size:100%;
-              position: absolute; left: 2%; bottom:4%; resize:none" placeholder="Rašykite savo kodą..."></textArea>
-                <script type="text/javascript">
-
-                    document.getElementById('runButton').addEventListener("mousedown", function() {
-                        getTextFromHistory();
-                    });
+<div id="tasks-display-panel" class="panel" style="display:none">
+    <h3 id="current-task-name">Užduoties pavadinimas</h3>
+    <p id="current-task-description">Užduoties detalus aprašymas</p>
+    <button id="create-task-compare-button" class="button" onclick="compareTaskImages()">Patikrinti</button>
+</div>
 
 
-                    document.getElementById("enteredCode").addEventListener("keydown", function(e) {
-                        if (e.keyCode == 13) { // on press vykdys pasirinkta kodo dali (arba paspaudus run mygtuka)
-                            console.log(window.getSelection().toString()); // gauna pasirinkta teksta ir kai paspaudi enter ji vykdo
-                            getTextFromHistory();
-                        }
-                    }, false);
-
-
-
-
-
-
-                    document.getElementById("inputCode").addEventListener("keydown", function(e) {
-                        //if (!e) { var e = window.event; }
-
-                        // Enter is pressed
-
-
-                        if(e.shiftKey && e.keyCode == 13){
-                            //console.log('shift + enter pressed');
-
-                        } else if (e.keyCode == 13) {
-                            //console.log('enter key is pressed');
-                            getText();
-                            document.getElementById('inputCode').value = "";
-                            document.getElementById("inputCode").focus();
-
-                            if(event.preventDefault) event.preventDefault();
-                            return false;
-                        } else if(e.keyCode == 38){ // up
-                            if(currentPositionInHistory > 0){
-                                currentPositionInHistory--;
-                                document.getElementById('inputCode').value = historyElements[currentPositionInHistory];
-
-                            }
-
-                        } else if(e.keyCode == 40){
-
-                            if(currentPositionInHistory >= 0 && currentPositionInHistory < historyElements.length-1){
-                                currentPositionInHistory++;
-                                document.getElementById('inputCode').value = historyElements[currentPositionInHistory];
-                            }
+<div id="input-panel" class="panel">
+    <div id="run"><div id="runButton" class="label">Vykdyti</div></div>
+    <div id="stop"><div id="stopButton" class="label">Sustabdyti</div></div>
+    <div id="clear"><div id="clearButton" class="label">Išvalyti</div></div>
+    <div id="input">
+        <div class="inner">
+            <div id="toggle">
+                <span id="expand-label">&#8679;</span>
+                <span id="collapse-label">&#8681;</span>
+            </div>
+            <textarea rows="1" cols="80" placeholder="Veskite savo kodą čia..." id="logo-ta-single-line"></textarea>
+            <textarea rows="20" cols="80" name="input-field2" placeholder="Veskite savo kodą čia..."  id="logo-ta-multi-line"></textarea>
+        </div>
+    </div>
+</div>
 
 
 
+<div id="sidebar-header" class="panel">
 
-                        }
+        <!-- unneccessary stuff -->
+        <a data-l10n-id="sb-link-reference" id="sb-link-reference" href="#"></a>
+        <a data-l10n-id="sb-link-library" id="sb-link-library" href="#"></a>
+        <a data-l10n-id="sb-link-history" id="sb-link-history" href="#"></a>
+        <a data-l10n-id="sb-link-examples" id="sb-link-examples" href="#"></a>
+        <a data-l10n-id="sb-link-extras" id="sb-link-extras" href="#"></a>
+        <a data-l10n-id="sb-link-links" id="sb-link-links" href="#"></a>
+
+        <div class="panel" id="tablink-baground"></div>
+
+        <!-- sidebar header buttons with tooltips -->
+        <button class="tablink tab-selected tooltip" onclick="openTab(event,'TasksTab')" >
+            <img src="./images/Tasks_W.png" width="23" height="23">
+            <span id="tasksToolTip" class="tooltiptext">Užduotys</span>
+        </button>
+
+        <button class="tablink tooltip" onclick="openTab(event,'HistoryTab')" >
+            <img src="./images/History_W.png" width="23" height="23">
+            <span id="historyTooltip" class="tooltiptext">Kodo istorija</span>
+        </button>
+
+        <button class="tablink tooltip" onclick="openTab(event,'LibraryTab')">
+            <img src="./images/Library_W.png" width="23" height="23">
+            <span id="libraryTooltip" class="tooltiptext">Biblioteka</span>
+        </button>
+        <button class="tablink tooltip" onclick="openTab(event,'ExamplesTab')">
+            <img src="./images/Examples_W.png" width="23" height="23">
+            <span id="examplesTooltip" class="tooltiptext">Pavyzdžiai</span>
+        </button>
+        <button class="tablink tooltip" onclick="openTab(event,'HelpTab')">
+            <img src="./images/Help_W.png" width="23" height="23">
+            <span id="helpTooltip" class="tooltiptext">Pagalba</span>
+        </button>
+        <button class="tablink tooltip" onclick="openTab(event,'SettingsTab')">
+            <img src="./images/Settings_W.png" width="23" height="23">
+            <span id="settingsTooltip" class="tooltiptext">Nustatymai</span>
+        </button>
+
+
+</div>
+
+    <div class="container" id="sidebar">
+        <!-- main tabs on sidebar -->
+        <div id="TasksTab" class="tab" > <!-- use # or $ to find history or library elements in index -->
+            <h2 id="TasksTabText">Užduotys</h2>
+            <div id="Tasks" style="position: relative;"></div>
+            <h3 id="TasksTabText">Šiandienos užduotys:</h3>
+            <div id="list-of-tasks"></div>
+            <button id = "in-panel-tasks-button" onclick="createNewTask();">Įkelti naują užduotį</button>
+            <div class="snippets"></div><br>
+
+
+            <hr id="separatorTasks">
+            <button class="button" data-l10n-id="extras-download-drawing" id="screenshot">Atsisiųsti paveikslą</button>
 
 
 
+        </div>
 
 
 
-                    }, false);
-                </script>
+        <div id="HistoryTab" class="tab" style="display:none"> <!-- use # or $ to find history or library elements in index -->
+            <h2 id="HistoryText">Kodo istorija</h2>
+            <div id="History" style="position: relative;"></div>
+            <div class="snippets"></div><br>
+            <button class="button" id="in-panel-history-button" onclick="clearHistory()">Išvalyti Istoriją</button>
+        </div>
+
+
+
+        <div id="LibraryTab" class="tab" style="display:none">
+            <h2 id="LibraryText">Biblioteka</h2>
+            <div id="Library" style="position: relative;"></div>
+            <div class="snippets"></div><br>
+
+            <button class="button" id="clearlibrary" data-l10n-id="extras-clear-library">Išvalyti Biblioteką</button>
+            <hr id="separatorLibrary">
+            <button class="button" data-l10n-id="extras-download-library" id="savelibrary">Atsisiųsti biblioteką</button>
+        </div>
+
+        <div id="ExamplesTab" class="tab" style="display:none">
+            <h2 id="ExamplesText">Pavyzdžiai</h2>
+            <div id="Examples" style="position: relative;"></div>
+        </div>
+
+
+        <div id="HelpTab" class="tab" style="display:none">
+            <h2 id="HelpText">Pagalba</h2>
+
+
+            <div id="en-help-content">
+            <p class="small" >
+                <dl>
+                <hr>
+                <h3 class="small">Turtle movement</h3>
+                <hr>
+                    <samp>
+
+                    <b>forward expr<br>
+                       fd expr<br></b>
+                       <dd>Move turtle forward by expr pixels.
+                        <div class="help-example tooltip" onclick="input.setValue('forward 100')">
+                            <span id="exampleTooltip" class="tooltiptext">Click to try this example</span>
+                            Example: forward 100</div> <!-- onclick copy the "forward 100" to input field" -->
+                       </dd>
+
+                    <b>backwards expr<br>
+                        bk expr</b>
+                        <dd>Move turtle backwards by expr pixels.
+                        <div class="help-example tooltip" onclick="input.setValue('back 100')">
+                            <span id="exampleTooltip" class="tooltiptext">Click to try this example</span>
+                            Example: back 100</div> <!-- onclick copy the "forward 100" to input field" -->
+                        </dd>
+
+                    <b>left expr<br>
+                            lt expr</b>
+                        <dd>Rotate turtle left by expr degrees.
+                            <div class="help-example tooltip" onclick="input.setValue('left 90')">
+                                <span id="exampleTooltip" class="tooltiptext">Click to try this example</span>
+                                Example: left 90</div> <!-- onclick copy the "forward 100" to input field" -->
+                        </dd>
+
+                    <b>right expr<br>
+                        rt expr</b>
+                        <dd>Rotate turtle right by expr degrees.
+                            <div class="help-example tooltip" onclick="input.setValue('right 90')">
+                                <span id="exampleTooltip" class="tooltiptext">Click to try this example</span>
+                                Example: right 90</div> <!-- onclick copy the "forward 100" to input field" -->
+                        </dd>
+
+
+                    <b>setx expr</b>
+                        <dd>Set turtle position to expr in x axis.
+                            <div class="help-example tooltip" onclick="input.setValue('setx 100')">
+                                <span id="exampleTooltip" class="tooltiptext">Click to try this example</span>
+                                Example: setx 100</div> <!-- onclick copy the "forward 100" to input field" -->
+                        </dd>
+                    <b>sety expr</b>
+                        <dd>Set turtle position to expr in y axis.
+                            <div class="help-example tooltip" onclick="input.setValue('sety 100')">
+                                <span id="exampleTooltip" class="tooltiptext">Click to try this example</span>
+                                Example: sety 100</div> <!-- onclick copy the "forward 100" to input field" -->
+                        </dd>
+                    <b>setpos [ expr1 expr2 ]<br>
+                            setxy expr1 expr2</b>
+                        <dd>Set turtle position to expr1 in x axis and expr2 in y axis.
+                            <div class="help-example tooltip" onclick="input.setValue('setpos [ 100 150 ]')">
+                                <span id="exampleTooltip" class="tooltiptext">Click to try this example</span>
+                                Example: setpos [ 100 150 ]</div> <!-- onclick copy the "forward 100" to input field" -->
+                        </dd>
+                    <b>setheading expr<br>
+                        seth expr</b>
+                        <dd>Set turtle rotation to expr degrees.
+                            <div class="help-example tooltip" onclick="input.setValue('setheading 60')">
+                                <span id="exampleTooltip" class="tooltiptext">Click to try this example</span>
+                                Example: setheading 60</div> <!-- onclick copy the "forward 100" to input field" -->
+                        </dd>
+                    <b>home</b>
+                        <dd>Move turtle back to center, pointing upwards.
+                            <div class="help-example tooltip" onclick="input.setValue('home')">
+                                <span id="exampleTooltip" class="tooltiptext">Click to try this example</span>
+                                Example: home</div> <!-- onclick copy the "forward 100" to input field" -->
+                        </dd>
+                    <b>arc angle radius</b>
+                        <dd>Without moving the turtle, draws an arc centered on the turtle, starting at the turtle's heading.
+                            <div class="help-example tooltip" onclick="input.setValue('arc 180 100')">
+                                <span id="exampleTooltip" class="tooltiptext">Click to try this example</span>
+                                Example: arc 180 100</div> <!-- onclick copy the "forward 100" to input field" -->
+                        </dd>
+
+                    </samp>
+                <hr>
+                <h3 class="small">Turtle motion queries</h3>
+                <hr>
+                more coming soon...
+
+                </dl>
+            </p>
             </div>
 
 
 
 
-<!-- Slider
 
-        <form>
-            <input type="range" value="50" style="position:absolute; top:5px;"/>
-        </form>
--->
+            <div id="lt-help-content">
+                <p class="small" >
+                <dl>
+
+                <hr>
+                <h3 class="small">Programos dalys</h3>
+                <hr>
+                <b>Piešimo laukas</b>
+                <dd>Piešimui skirta vieta, kur vėžliukas atvaizduoja naudotojo įrašomą kodą. Šioje srityje paspaudus dešinį pelės klavišą,
+                    pasirodo meniu patogesniam dažniau naudojamų užklausų vykdumui.</dd>
+                <b>Įvesties juosta</b>
+                <dd>Juosta esanti po piešimo lauku, kurioje vedamos visos piešimui skirtos užklausos. Ši juosta gali būti padidinta arba sumažinta paspaudus dešinėje esančią rodyklę.
+                    Jeigu naudojama sumažinta juosta, užklausos vykdomos paspaudus "Enter" klavišą klaviatūroje arba paspaudus mygtuką "Vykdyti". Jeigu įvesties juosta padidinta - naudojamas
+                 tik "Vykdyti" mygtukas. "Išvalyti mygtukas" ištrina visą įvesties laukelyje esantį tekstą.</dd>
+                <b>Versijavimo juosta</b>
+                <dd>Tai yra juosta, esanti piešimo lauko viršuje. Kiekvienas veiksmas yra išsaugomas atskirame pilkame langelyje. Bet kurioje piešimo stadijoje galima paspausti ant
+                norimo langelio ir taip grįžti į pasirinktą vietą piešimo istorijoje. Jeigu istorijos langelių yra daugiau, nei telpa vienoje juostoje, naudojama dešinėje pusėje esanti rodyklė.
+                Ši rodyklė padidina bei sumažina versijavimo juostą.</dd>
+                <b>Skirtukas "Užduotys"</b>
+                <dd>Šiame lange pateiktos sukurtos užduotys, kurias reikia įvykdyti. Pasirinkus norimą užduotį dešinėje ekrano pusėje
+                atsiras užduoties aprašymas su mygtuku "Patikrinti". Baigus vykdyti užduotį ir paspaudus šį mygtuką, užduotis bus automatiškai patikrinama.
+                    Kiek žemiau užduočių yra mygtukas "Atsisiųsti paveikslą", paspaudus šį mygtuką, jūsų nupieštas paveikslas bus atsiunčiamas į jūsų kompiuterį.
+                </dd>
+                <b>Skirtukas "Kodo istorija"</b>
+                <dd>Šiame lange patalpinamos visos piešimo procesu panaudotos užklausos. Paspaudus ant bet kurios iš jų,
+                užklausa bus automatiškai nukopijuojama į įvesties juostą apačioje. Ši užklausa tuomet gali būti redaguojama pakartotinai įvykdoma. Žemiau esantis
+                mygtukas "Išvalyti istoriją" pašalins visas istorijoje išsaugotas užklausos.</dd>
+                <b>Skirtukas "Biblioteka"</b>
+                <dd>Šiame lange saugomos visos projekte panaudotos struktūros. Šias struktūras galima redaguoti, įvesties juostoje įrašant naują struktūrą tuo pačiu pavadinimu.
+                    Struktūrų sąrašą galima atsisiųsti paspaudus apačioje esantį mygtuką "Atsisiųsti biblioteką".</dd>
+                <b>Skirtukas "Pavyzdžiai"</b>
+                <dd>Šiame lange rasite iš anksto sukurtus kodo pavyzdžius. Pasirinkus bet kurį pavyzdį, jo kodas
+                    nukopijuojamas į įvesties juostą, iš kur jis gali būti įvykdytas.</dd>
+                <b>Skirtukas "Pagalba"</b>
+                <dd>Šis langas skirtas pagelbėti naujiems naudotojams susipažinti su šia programa ar išsiaiškinti kaip veikia tam tikros užklausos. Žemiau yra išvardytos
+                kelios pagrindinės užklausos su pavyzdžiais.</dd>
+
+                <hr>
+                <h3 class="small">Pagrindinės komandos</h3>
+                    <hr>
+                    <h3 class="small">Vėžliuko judėjimas</h3>
+                    <hr>
+                    <samp>
+
+                        <b>priekin išraiška<br>
+                            pr išraiška<br></b>
+                        <dd>Paeiti vėžliuku į priekį per išraiškos kiekį pikselių.
+                            <div class="help-example tooltip" onclick="input.setValue('priekin 100')">
+                                <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti</span>
+                                Pavyzdžiui: priekin 100</div> <!-- onclick copy the "forward 100" to input field" -->
+                        </dd>
+
+                        <b>atgal išraiška<br>
+                            at išraiška</b>
+                        <dd>Paeiti vėžliuku atgal per išraiškos kiekį pikselių.
+                            <div class="help-example tooltip" onclick="input.setValue('atgal 100')">
+                                <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti</span>
+                                Pavyzdžiui: atgal 100</div> <!-- onclick copy the "forward 100" to input field" -->
+                        </dd>
+
+                        <b>kairėn išraiška<br>
+                            kr išraiška</b>
+                        <dd>Pasukti vėžliuką kairėn per išraiškos kiekį laipsnių.
+                            <div class="help-example tooltip" onclick="input.setValue('kairėn 90')">
+                                <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti</span>
+                                Pavyzdžiui: kairėn 90</div> <!-- onclick copy the "forward 100" to input field" -->
+                        </dd>
+
+                        <b>dešinėn išraiška<br>
+                            dš išraiška</b>
+                        <dd>Pasukti vėžliuką dešinėn per išraiškos kiekį laipsnių.
+                            <div class="help-example tooltip" onclick="input.setValue('dešinėn 90')">
+                                <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti</span>
+                                Pavyzdžiui: dešinėn 90</div> <!-- onclick copy the "forward 100" to input field" -->
+                        </dd>
+
+                        <b>eik.x išraiška</b>
+                        <dd>Nustatyti vėžliuko poziciją x ašyje į išraišką.
+                            <div class="help-example tooltip" onclick="input.setValue('eik.x 100')">
+                                <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti</span>
+                                Pavyzdžiui: eik.x 100</div> <!-- onclick copy the "forward 100" to input field" -->
+                        </dd>
+                        <b>eik.y išraiška</b>
+                        <dd>Nustatyti vėžliuko poziciją y ašyje į išraišką.
+                            <div class="help-example tooltip" onclick="input.setValue('eik.y 100')">
+                                <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti</span>
+                                Pavyzdžiui: eik.y 100</div> <!-- onclick copy the "forward 100" to input field" -->
+                        </dd>
+                        <b>eik.x.y išraiška1 išraiška2</b>
+                        <dd>Nustatyti vėžliuko poziciją į išraiška1 x ašyje ir išraiška2 y ašyje.
+                            <div class="help-example tooltip" onclick="input.setValue('eik.x.y 100 150')">
+                                <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti</span>
+                                Pavyzdžiui: eik.x.y 100 150</div> <!-- onclick copy the "forward 100" to input field" -->
+                        </dd>
+                        <b>žvelk išraiška</b>
+                        <dd>Nustatyti vėžliuko pasisukimą į išraiška laipsnių
+                            <div class="help-example tooltip" onclick="input.setValue('žvelk 60')">
+                                <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti</span>
+                                Pavyzdžiui: žvelk 60</div> <!-- onclick copy the "forward 100" to input field" -->
+                        </dd>
+                        <b>namo</b>
+                        <dd>Grąžinti vėžliuką atgal į centrą, žiūrintį į priekį.
+                            <div class="help-example tooltip" onclick="input.setValue('namo')">
+                                <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti</span>
+                                Pavyzdžiui: namo</div> <!-- onclick copy the "forward 100" to input field" -->
+                        </dd>
+                        <b>lankas išraiška1 išraiška2</b>
+                        <dd>Nepajudinant vežliuko piešiamas lankas išraiška1 kampu ir išraiška2 spinduliu, pagal laikrodžio rodyklę, pradedant vėžliuko žiūrėjimo kryptimi, centras yra vežliuko pozicija.
+                            <div class="help-example tooltip" onclick="input.setValue('lankas 180 100')">
+                                <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti</span>
+                                Pavyzdžiui: lankas 180 100</div> <!-- onclick copy the "forward 100" to input field" -->
+                        </dd>
+
+
+                    </samp>
+                    <hr>
+
+
+                <h3 class="small">Pieštuko užklausos</h3>
+                <hr>
+                <samp>
+                    <b>piešim<br>
+                        pš<br></b>
+                    <dd>Nuleidžia pieštuką, po šios komandos pajudėjus vėžliuku bus piešiama.
+                        <div class="help-example tooltip" onclick="input.setValue('piešim')">
+                            <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti</span>
+                            Pavyzdžiui: piešim</div> <!-- onclick copy the "forward 100" to input field" -->
+                    </dd>
+                    <b>eisim<br>
+                        es<br></b>
+                    <dd>Pakelia pieštuką, po šios komandos pajudėjus vėžliuku nebebus piešiama.
+                        <div class="help-example tooltip" onclick="input.setValue('eisim')">
+                            <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti</span>
+                            Pavyzdžiui: eisim</div> <!-- onclick copy the "forward 100" to input field" -->
+                    </dd>
+
+
+                    <b>piešim?</b>
+                    <dd>Grąžina reikšmę 1 jei pieštukas yra nuleistas, 0, jei pakeltas.
+                        <div class="help-example tooltip" onclick="input.setValue('piešim?')">
+                            <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti</span>
+                            Pavyzdžiui: piešim?</div> <!-- onclick copy the "forward 100" to input field" -->
+                    </dd>
+
+
+                    <b>pasirink.pieštuko.storį išraiška<br>
+                        pps išraiška<br></b>
+                    <dd>Pakeičia pieštuko storį į išraiška
+                        <div class="help-example tooltip" onclick="input.setValue('pasirink.pieštuko.storį 10')">
+                            <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti</span>
+                            Pavyzdžiui: pasirink.pieštuko.storį 10</div> <!-- onclick copy the "forward 100" to input field" -->
+                    </dd>
+                    <b>pieštuko.storis</b>
+                    <dd>Grąžina pieštuko storio reikšmę
+                        <div class="help-example tooltip" onclick="input.setValue('pieštuko.storis')">
+                            <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti</span>
+                            Pavyzdžiui: pieštuko.storis</div> <!-- onclick copy the "forward 100" to input field" -->
+                    </dd>
 
 
 
 
-        <!-- button element -->
-        <button type="button" id="topButton"
-                style="font-size:90%; width:21.35%; height: 4%;
-                position: absolute; top:5%; left: 2%; resize:none" onclick="javascript:nullText()">Valyti istoriją</button>
-                <script type="text/javascript">
-                    function nullText() {
-                        document.getElementById('enteredCode').value = "";
+                    <b>pieštuko.spalva<br>
+                        psp<br></b>
+                    <dd>Grąžina pieštuko spalvos reikšmę šešioliktainiu formatu
+                        <div class="help-example tooltip" onclick="input.setValue('pieštuko.spalva')">
+                            <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti</span>
+                            Pavyzdžiui: pieštuko.spalva</div> <!-- onclick copy the "forward 100" to input field" -->
+                    </dd>
+
+
+                    <b>pasirink.pieštuko.spalvą [raudona žalia mėlyna]<br>
+                        ppsp [raudona žalia mėlyna]<br></b>
+                    <dd>Pakeičia pieštuko spalvą į naują spalvą, sudarytą iš reikšmių raudona, žalia bei mėlyna. Jų reikšmės yra tarp 0 ir 255.
+                        <div class="help-example tooltip" onclick="input.setValue('pasirink.pieštuko.spalvą [255 0 0]')">
+                            <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti</span>
+                            Pavyzdžiui: pasirink.pieštuko.spalvą [255 0 0]</div> <!-- onclick copy the "forward 100" to input field" -->
+                    </dd>
+                    <b>pasirink.fono.spalvą [raudona žalia mėlyna]<br>
+                        pfsp [raudona žalia mėlyna]<br></b>
+                    <dd>Pakeičia fono spalvą į naują spalvą, sudarytą iš reikšmių raudona, žalia bei mėlyna. Jų reikšmės yra tarp 0 ir 255.
+                        <div class="help-example tooltip" onclick="input.setValue('pasirink.fono.spalvą [255 0 0]')">
+                            <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti</span>
+                            Pavyzdžiui: pasirink.fono.spalvą [255 0 0]</div> <!-- onclick copy the "forward 100" to input field" -->
+                    </dd>
 
 
 
-                    }
-                </script>
+                </samp>
+                <hr>
 
-    </div>
+                <h3 class="small">Aritmetinės užklausos</h3>
+                <hr>
+                <samp>
+                    <b>sum išraiška1 išraiška2</b>
+                    <dd>Sudeda du skaičius - išraiška1 + išraiška2
+                        <div class="help-example tooltip" onclick="input.setValue('sum 10 15')">
+                            <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti.</span>
+                            Pavyzdžiui: sum 10 15</div> <!-- onclick copy the "forward 100" to input field" -->
+                    </dd>
+                    <b>skirtumas išraiška1 išraiška2</b>
+                    <dd>Atimu skaičių išraiška2 iš išraiška1
+                        <div class="help-example tooltip" onclick="input.setValue('skirtumas 20 15')">
+                            <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti.</span>
+                            Pavyzdžiui: skirtumas 20 15</div> <!-- onclick copy the "forward 100" to input field" -->
+                    </dd>
+                    <b>išraiška1 * išraiška2</b>
+                    <dd>Sudaugina skaičius išraiška1 ir išraiška2
+                        <div class="help-example tooltip" onclick="input.setValue('2 * 30')">
+                            <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti.</span>
+                            Pavyzdžiui: 2 * 30</div> <!-- onclick copy the "forward 100" to input field" -->
+                    </dd>
+                    <b>išraiška1 / išraiška2</b>
+                    <dd>Padalina skaičių išraiška1 iš išraiška2
+                        <div class="help-example tooltip" onclick="input.setValue('30 / 2')">
+                            <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti.</span>
+                            Pavyzdžiui: 30 / 2</div> <!-- onclick copy the "forward 100" to input field" -->
+                    </dd>
+                    <b>abs išraiška</b>
+                    <dd>Grąžina absoliučią skaičiaus išraiška reikšmę
+                        <div class="help-example tooltip" onclick="input.setValue('abs 3,14')">
+                            <span id="exampleTooltip" class="tooltiptext">Paspausk norėdamas išbandyti.</span>
+                            Pavyzdžiui: abs 3,14</div> <!-- onclick copy the "forward 100" to input field" -->
+                    </dd>
 
-        <div style="position: absolute; right:50px; top:50px;" >
+                </samp>
 
-            <!-- UPLOAD IMAGES FOR CANVAS HERE -->
-            <img id="turtle" width="0" height="0"
-                 src="./images/turtle.png">
+                </dl>
+                </p>
+            </div>
 
-            <!-- CANVAS -->
-            <canvas id="drawingCanvas" onresize="resize_canvas()"
-                    style="border:1px solid white; background-color:white">
 
-                <canvas id="imagingCanvas">
-                <!-- canvas element for drawing (canvas rescale su js) -->
-                <script type="text/javascript" src="./javascripts/resizeCanvas.js"></script>
-                <script type="text/javascript" src="./javascripts/drawOnCanvas.js"></script>
-                </canvas>
-            </canvas>
+
+
+
+
         </div>
-    </div>
-</form>
 
+        <div id="SettingsTab" class="tab" style="display:none">
+            <h2 id="SettingsText">Nustatymai</h2>
+
+            <button id="language-lt" onclick="setLanguageToLT()">
+                <img id="flag" src="./images/LT-flag.svg" width="28" height="28">
+            </button>
+            <button id="language-en" onclick="setLanguageToEN()">
+                <img id="flag" src="./images/US-flag.svg" width="28" height="28">
+            </button><p></p>
+            <div id="settings-inner-menu">
+
+                <h3 class="medium"> Teacher's menu</h3>
+                <!--<button onclick="saveCanvasLocally('teachers')"> Save teacher's </button> -->
+                <button id="save-teachers-version" onclick="saveTeachersCanvas('teachers')"> Save task </button>
+                <button id="show-teachers-version" onclick="loadCanvasLocally('teachers')"> Show task </button>
+
+                <hr>
+                <h3 class="medium"> Student's menu</h3>
+                <!--<button onclick="loadCanvasLocally('lastversion')"> Load last </button> -->
+
+                <button id="compare-images" onclick="compareTaskImages()"> Compare images </button>
+                <p></p>
+                <hr>
+            </div>
+             <!-- <select id="select-lang"></select> -->
+        </div>
+
+        <!-- Right-click menus -->
+        <!-- sidebar right-click menu -->
+        <!--<div class="sidebar-right-click-menu">
+            <div class="right-click-menu-item" onclick="message('sidebar option 1 pressed')">sidebar 1 option</div>
+            <div class="right-click-menu-item" onclick="message('sidebar option 2 pressed')">sidebar 2 option</div>
+
+            <div class="right-click-menu-item" onclick="message('sidebar option 3 pressed')">sidebar 3 option</div>
+            <div class="right-click-menu-item" onclick="message('sidebar option 3 pressed')">sidebar 4 option</div>
+        </div>-->
+
+        <!-- canvas right-click menu -->
+        <div class="canvas-right-click-menu">
+            <div class="right-click-menu-item" onclick="turtle.pendown = false; window.document.querySelector('.canvas-right-click-menu').style.display='none'" >Pakelti pieštuką</div>
+            <div class="right-click-menu-item" onclick="turtle.pendown = true; window.document.querySelector('.canvas-right-click-menu').style.display='none'">Nuleisti pieštuką</div>
+            <div class="right-click-menu-item" onclick="penWidthSelector()">Keisti pieštuko storį</div> <!-- popup window with examples -->
+            <div class="right-click-menu-item" onclick="colorSelector('pen')">Keisti pieštuko spalvą</div> <!-- popup window with examples -->
+            <hr>
+            <div class="right-click-menu-item" onclick="writeTextOnScreen()">Rašyti tekstą</div> <!-- popup window with examples -->
+            <hr>
+            <div class="right-click-menu-item" onclick="turtle.clearscreen(); window.document.querySelector('.canvas-right-click-menu').style.display='none'">Išvalyti piešimo lauką</div>
+            <div class="right-click-menu-item" onclick="backgroundImageUploader()">Keisti fono paveikslėlį</div> <!-- put image on background -->
+            <div class="right-click-menu-item" onclick="colorSelector('background')">Keisti fono spalvą</div> <!-- popup window with examples -->
+            <!--<hr>
+            <div class="right-click-menu-item" onclick="message('canvas option 4 pressed')">Save image</div> --> <!-- will save image in images library on the left -->
+        </div>
+
+    </div>
+
+<div id="VersionHistory">
+
+</div>
+<button id="version-history-toggle" value="down" style="font-weight: bold" onclick="toggleVersionHistoryWindow()">&#8681;</button>
+
+<!-- The Modal Menus-->
+<div id="pen-width-menu" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content" id="width-content">
+        <span class="close">&times;</span>
+        <h2> Pasirinkite pieštuko storį</h2>
+        <img id="width-examples-image" src="./images/Width_Examples.jpg" width="580" height="155">
+        <!-- width selection from examples -->
+        <!--<div id="width-example-selection-buttons">
+            <button id="width-example-selection1" class="example-button"></button>
+            <button id="width-example-selection2" class="example-button"></button>
+            <button id="width-example-selection3" class="example-button"></button>
+        </div>-->
+
+        <div id="modal-text-under-picture">
+            <hr>
+            <input type="text" id="width-slider-value" name="Width" onClick="this.select();">
+            <div id="slidecontainer">
+                <input type="range" min="1" max="100" value="1" class="slider" id="pen-width-slider-range">
+            </div>
+        </div>
+        <button id="modal-window-cancel-button">Atšaukti</button>
+        <button id="modal-window-set-button">Patvirtinti</button>
+    </div>
+</div>
+
+<div id="loading-overlay" style="display:none">
+    <div id="overlay-background">s
+        <H1 id="overlay-text">Įkeliama užduotis...</H1>
+        <H1 id="overlay-number">0%</H1>
+    </div>
+
+</div>
+
+<div id="color-menu" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+        <span class="close2">&times;</span>
+        <h2 id="color-selection-heading">Pasirinkite pieštuko spalvą</h2>
+
+        <fieldset>
+            <label for="r">Raudona</label>
+            <input type="text" value="0" for="r" id="r_out" onClick="this.select();" />
+            <input type="range" min="0" max="255" id="r" step="1" value="0">
+
+        </fieldset>
+
+        <fieldset>
+            <label for="g">Žalia</label>
+            <input type="text" value="0" for="g" id="g_out" onClick="this.select();" />
+            <input type="range" min="0" max="255" id="g" step="1" value="0">
+
+        </fieldset>
+
+        <fieldset>
+            <label for="b">Mėlyna</label>
+            <input type="text" value="0" for="b" id="b_out" onClick="this.select();" />
+            <input type="range" min="0" max="255" id="b" step="1" value="0">
+
+        </fieldset>
+
+        <input type="text" id="hex" />
+
+        <div id="generated-color-box"></div>
+        <div id="standard-colors-palette">
+            <button id="color1" class="color-preset" style="background-color:#FFDEDB"></button>
+            <button id="color2" class="color-preset" style="background-color:#FE8176"></button>
+            <button id="color3" class="color-preset" style="background-color:#FE2712"></button>
+            <button id="color4" class="color-preset" style="background-color:#A70F01"></button>
+            <button id="color5" class="color-preset" style="background-color:#340D09"></button>
+
+            <button id="color6" class="color-preset" style="background-color:#FFE5DC"></button>
+            <button id="color7" class="color-preset" style="background-color:#FE9772"></button>
+            <button id="color8" class="color-preset" style="background-color:#FD4D0C"></button>
+            <button id="color9" class="color-preset" style="background-color:#A22C02"></button>
+            <button id="color10" class="color-preset" style="background-color:#341509"></button>
+
+            <button id="color11" class="color-preset" style="background-color:#FFEBDC"></button>
+            <button id="color12" class="color-preset" style="background-color:#FEAB6D"></button>
+            <button id="color13" class="color-preset" style="background-color:#FC7307"></button>
+            <button id="color14" class="color-preset" style="background-color:#9D4502"></button>
+            <button id="color15" class="color-preset" style="background-color:#341C09"></button>
+
+            <button id="color16" class="color-preset" style="background-color:#FFF1DC"></button>
+            <button id="color17" class="color-preset" style="background-color:#FDC168"></button>
+            <button id="color18" class="color-preset" style="background-color:#FB9902"></button>
+            <button id="color19" class="color-preset" style="background-color:#975B02"></button>
+            <button id="color20" class="color-preset" style="background-color:#342309"></button>
+
+            <button id="color21" class="color-preset" style="background-color:#FFF5DC"></button>
+            <button id="color22" class="color-preset" style="background-color:#FED777"></button>
+            <button id="color23" class="color-preset" style="background-color:#FCBA12"></button>
+            <button id="color24" class="color-preset" style="background-color:#A77802"></button>
+            <button id="color25" class="color-preset" style="background-color:#342809"></button>
+
+            <button id="color26" class="color-preset" style="background-color:#FFF9DC"></button>
+            <button id="color27" class="color-preset" style="background-color:#FEEC86"></button>
+            <button id="color28" class="color-preset" style="background-color:#FDDC22"></button>
+            <button id="color29" class="color-preset" style="background-color:#B69B02"></button>
+            <button id="color30" class="color-preset" style="background-color:#342E09"></button>
+
+            <button id="color31" class="color-preset" style="background-color:#FFFFDB"></button>
+            <button id="color32" class="color-preset" style="background-color:#FEFE9A"></button>
+            <button id="color33" class="color-preset" style="background-color:#FEFE33"></button>
+            <button id="color34" class="color-preset" style="background-color:#CBCB01"></button>
+            <button id="color35" class="color-preset" style="background-color:#343409"></button>
+
+            <button id="color36" class="color-preset" style="background-color:#F7FBDF"></button>
+            <button id="color37" class="color-preset" style="background-color:#E3F08E"></button>
+            <button id="color38" class="color-preset" style="background-color:#CBE432"></button>
+            <button id="color39" class="color-preset" style="background-color:#8C9E15"></button>
+            <button id="color40" class="color-preset" style="background-color:#2E3409"></button>
+
+            <button id="color41" class="color-preset" style="background-color:#F1F8E2"></button>
+            <button id="color42" class="color-preset" style="background-color:#C0DF81"></button>
+            <button id="color43" class="color-preset" style="background-color:#98CA32"></button>
+            <button id="color44" class="color-preset" style="background-color:#59761E"></button>
+            <button id="color45" class="color-preset" style="background-color:#263409"></button>
+
+            <button id="color46" class="color-preset" style="background-color:#EBF7E3"></button>
+            <button id="color47" class="color-preset" style="background-color:#9BD770"></button>
+            <button id="color48" class="color-preset" style="background-color:#66B032"></button>
+            <button id="color49" class="color-preset" style="background-color:#375F1B"></button>
+            <button id="color50" class="color-preset" style="background-color:#1B3409"></button>
+
+            <button id="color51" class="color-preset" style="background-color:#E7F3EF"></button>
+            <button id="color52" class="color-preset" style="background-color:#79BEA8"></button>
+            <button id="color53" class="color-preset" style="background-color:#448D76"></button>
+            <button id="color54" class="color-preset" style="background-color:#23483C"></button>
+            <button id="color55" class="color-preset" style="background-color:#093426"></button>
+
+            <button id="color56" class="color-preset" style="background-color:#E1ECF9"></button>
+            <button id="color57" class="color-preset" style="background-color:#609CE1"></button>
+            <button id="color58" class="color-preset" style="background-color:#236AB9"></button>
+            <button id="color59" class="color-preset" style="background-color:#133863"></button>
+            <button id="color60" class="color-preset" style="background-color:#091D34"></button>
+
+            <button id="color61" class="color-preset" style="background-color:#DBE5FF"></button>
+            <button id="color62" class="color-preset" style="background-color:#678FFE"></button>
+            <button id="color63" class="color-preset" style="background-color:#0247FE"></button>
+            <button id="color64" class="color-preset" style="background-color:#012998"></button>
+            <button id="color65" class="color-preset" style="background-color:#091534"></button>
+
+            <button id="color66" class="color-preset" style="background-color:#E0E0FB"></button>
+            <button id="color67" class="color-preset" style="background-color:#8A8AEF"></button>
+            <button id="color68" class="color-preset" style="background-color:#2E2FE3"></button>
+            <button id="color69" class="color-preset" style="background-color:#151599"></button>
+            <button id="color70" class="color-preset" style="background-color:#090934"></button>
+
+            <button id="color71" class="color-preset" style="background-color:#E9DFFB"></button>
+            <button id="color72" class="color-preset" style="background-color:#905BEC"></button>
+            <button id="color73" class="color-preset" style="background-color:#5A18C9"></button>
+            <button id="color74" class="color-preset" style="background-color:#300D6E"></button>
+            <button id="color75" class="color-preset" style="background-color:#190934"></button>
+
+            <button id="color76" class="color-preset" style="background-color:#F7DBFF"></button>
+            <button id="color77" class="color-preset" style="background-color:#C91BFE"></button>
+            <button id="color78" class="color-preset" style="background-color:#8601AF"></button>
+            <button id="color79" class="color-preset" style="background-color:#3A004C"></button>
+            <button id="color80" class="color-preset" style="background-color:#2A0934"></button>
+
+            <button id="color81" class="color-preset" style="background-color:#FDDEF3"></button>
+            <button id="color82" class="color-preset" style="background-color:#F033B4"></button>
+            <button id="color83" class="color-preset" style="background-color:#AE0D7A"></button>
+            <button id="color84" class="color-preset" style="background-color:#510639"></button>
+            <button id="color85" class="color-preset" style="background-color:#340926"></button>
+
+            <button id="color86" class="color-preset" style="background-color:#FBDFE6"></button>
+            <button id="color87" class="color-preset" style="background-color:#EC6988"></button>
+            <button id="color88" class="color-preset" style="background-color:#D61A46"></button>
+            <button id="color89" class="color-preset" style="background-color:#7B0F28"></button>
+            <button id="color90" class="color-preset" style="background-color:#340913"></button>
+
+            <button id="color91" class="color-preset" style="background-color:#FFFFFF; border: 1px solid lightgrey"></button>
+            <button id="color92" class="color-preset" style="background-color:#c9c9c9"></button>
+            <button id="color93" class="color-preset" style="background-color:#909090"></button>
+            <button id="color94" class="color-preset" style="background-color:#545454"></button>
+            <button id="color95" class="color-preset" style="background-color:#000000"></button>
+        </div>
+
+        <button id="modal-window-cancel-button2">Atšaukti</button>
+        <button id="modal-window-set-button2">Patvirtinti</button>
+    </div>
+</div>
+
+<div id="write-text-menu" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content" id="write-text-content">
+        <span class="close3">&times;</span>
+        <h2> Rašykite tekstą</h2>
+
+        <textarea id="write-text-textcontent" rows="4" cols="50" placeholder="Jūsų tekstas..."></textarea>
+
+        <div id="under-text-content">
+                <select id="font-size-selector">
+                    <option value="5">5 pt</option>
+                    <option value="5.5">5,5 pt</option>
+                    <option value="6.5">6,5 pt</option>
+                    <option value="7.5">7,5 pt</option>
+                    <option value="8">8 pt</option>
+                    <option value="9">9 pt</option>
+                    <option value="10">10 pt</option>
+                    <option value="10.5">10,5 pt</option>
+                    <option value="11">11 pt</option>
+                    <option value="12">12 pt</option>
+                    <option value="14">14 pt</option>
+                    <option value="16">16 pt</option>
+                    <option value="18">18 pt</option>
+                    <option value="20">20 pt</option>
+                    <option value="22">22 pt</option>
+                    <option value="24">24 pt</option>
+                    <option value="26">26 pt</option>
+                    <option value="28">28 pt</option>
+                    <option value="36">36 pt</option>
+                    <option value="48">48 pt</option>
+                    <option value="72">72 pt</option>
+                </select>
+
+            <select id="font-name-selector">
+                <option value="sans-serif">sans-serif</option>
+                <option value="serif">serif</option>
+                <option value="cursive">cursive</option>
+                <option value="fantasy">fantasy</option>
+                <option value="monospace">monospace</option>
+            </select>
+
+            <button id="colorPickerBackground" onclick="colorSelector('pen')">Pieštuko spalva</button>
+        </div>
+
+
+        <button id="modal-window-cancel-button3">Atšaukti</button>
+        <button id="modal-window-set-button3">Patvirtinti</button>
+    </div>
+</div>
+
+
+
+<div id="background-menu" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content" id="background-menu-content">
+        <span class="close4">&times;</span>
+        <h2> Pasirinkite paveikslėlį</h2>
+
+
+        <input type='file' id='getImage' name="background-image" /><br/><br/>
+        <div id='background-preview'></div>
+
+
+        <button id="modal-window-cancel-button4">Atšaukti</button>
+        <button id="modal-window-set-button4">Patvirtinti</button>
+    </div>
+</div>
+
+<div id="alert-menu" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content" id="alert-content">
+        <span class="close5">&times;</span>
+        <h3 id="error-message-field"> Error message</h3>
+
+        <!-- width selection from examples -->
+        <!--<div id="width-example-selection-buttons">
+            <button id="width-example-selection1" class="example-button"></button>
+            <button id="width-example-selection2" class="example-button"></button>
+            <button id="width-example-selection3" class="example-button"></button>
+        </div>-->
+
+
+        <button id="modal-window-dismiss-button">Uždaryti</button>
+    </div>
+</div>
+
+<div id="create-task-menu" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content" id="create-task-content">
+        <span class="close6">&times;</span>
+        <h2> Nauja užduotis</h2>
+
+        <textarea id="create-task-name-content" rows="4" cols="50" placeholder="Pavadinimas..."></textarea>
+        <textarea id="create-task-task-content" rows="4" cols="50" placeholder="Aprašymas..."></textarea>
+
+        <button id="modal-window-cancel-button6">Atšaukti</button>
+        <button id="modal-window-set-button6">Patvirtinti</button>
+    </div>
+</div>
+
+
+<script>
+    function showStartingPage() {
+
+
+        //document.getElementById("display-panel").style.display = 'none';
+        //document.getElementById("VersionHistory").style.display = 'none';
+        //document.getElementById("version-history-toggle").style.display = 'none';
+        //document.getElementById("input-panel").style.display = 'none';
+
+
+    }
+
+    /*function createNewTask(){
+
+        //createNewTask();
+
+
+        document.getElementById("create-task-menu").style.display = 'block';
+        document.getElementById("loading-overlay").style.display = 'block';
+        document.getElementById("overlay-number").innerHTML = "0%";
+        //saveTeachersCanvas('teachers');
+
+    }*/
+
+
+</script>
+
+
+<script src="./javascripts/floodfill.js"></script>
+<script src="./javascripts/logo.js"></script>
+<script src="./javascripts/turtle.js"></script>
+<script src="./javascripts/dialog.js"></script>
+<script src="./javascripts/index.js"></script>
+<script src="./javascripts/userInterface.js"></script>
+<script src="./javascripts/imageComparator.js"></script>
+<script src="./javascripts/tasks.js"></script>
+
+</body>
