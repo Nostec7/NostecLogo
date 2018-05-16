@@ -743,7 +743,7 @@ window.addEventListener('DOMContentLoaded', function() {
         initStorage(function (def) {
             logo.run(def);
         });
-    },parsingDuration);
+    },parsingDuration + 500);
 
 
 

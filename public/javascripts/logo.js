@@ -1,5 +1,5 @@
 /**
- * Created by pauliuslegeckas on 10/03/2017.
+ * Created by pauliuslegeckas on 20/11/2017.
  */
 
 var language = [];
@@ -55,11 +55,13 @@ function setCookie(cname, cvalue) {
 function LogoInterpreter(turtle, stream, savehook) {
   'use strict';
 
+
   language = lietuviu;
   if(getCookie("language") == ""){ // standard language set to Lietuviu (first time)
       setCookie("language", "Lietuviu");
   }
   var selectedLanguage = getCookie("language");
+
 
   var errorMessage = [];
   // Error messages (dafault values)
@@ -189,7 +191,6 @@ function LogoInterpreter(turtle, stream, savehook) {
   } else if(selectedLanguage == "Lietuviu"){ //default values
       language = lietuviu;
   }
-
   var self = this;
 
   var UNARY_MINUS = '<UNARYMINUS>'; // Must not parse as a word
@@ -547,7 +548,6 @@ function LogoInterpreter(turtle, stream, savehook) {
 
   function Type(atom) {
     if (atom === undefined) {
-      // TODO: Should be caught higher upstream than this
       throw err("No output from procedure", ERRORS.NO_OUTPUT);
     } else if (typeof atom === 'string' || typeof atom === 'number') {
       return 'word';
@@ -574,7 +574,7 @@ function LogoInterpreter(turtle, stream, savehook) {
 
   function parse(string) {
     if (string === undefined) {
-      return undefined; // TODO: Replace this with ...?
+      return undefined;
     }
 
     var atoms = [],
@@ -609,15 +609,6 @@ function LogoInterpreter(turtle, stream, savehook) {
         atom = parseNumber(stream);
       } else if (inChars(stream.peek(), OPERATOR_CHARS)) {
         atom = parseOperator(stream);
-        // From UCB Logo:
-
-        // Minus sign means infix difference in ambiguous contexts
-        // (when preceded by a complete expression), unless it is
-        // preceded by a space and followed by a nonspace.
-
-        // Minus sign means unary minus if the previous token is an
-        // infix operator or open parenthesis, or it is preceded by a
-        // space and followed by a nonspace.
 
         if (atom === '-') {
           var trailing_space = isWS(stream.peek());
@@ -672,10 +663,6 @@ function LogoInterpreter(turtle, stream, savehook) {
     return inChars(c, OWNWORD_CHARS);
   }
 
-  // "A word not after a quotation mark or inside square brackets is
-  // delimited by a space, a bracket, a parenthesis, or an infix
-  // operator +-*/=<>. Note that words following colons are in this
-  // category. Note that quote and colon are not delimiters."
   var WORD_DELIMITER = WS_CHARS + '[](){}+-*/%^=<>';
   function parseWord(stream) {
     var word = '';
@@ -686,10 +673,6 @@ function LogoInterpreter(turtle, stream, savehook) {
     return word;
   }
 
-  // "Each infix operator character is a word in itself, except that
-  // the two-character sequences <=, >=, and <> (the latter meaning
-  // not-equal) with no intervening space are recognized as a single
-  // word."
   var OPERATOR_CHARS = '+-*/%^=<>[]{}()';
   function parseOperator(stream) {
     var word = '';
@@ -1740,7 +1723,6 @@ function LogoInterpreter(turtle, stream, savehook) {
   });
 
   def(language[215], function(list) {
-    // TODO: This only works with JS equality. Use equalp.
     var set = new Set();
     return sifw(list, lexpr(list).filter(function(x) {
       if (set.has(x)) { return false; } else { set.add(x); return true; }
@@ -2706,7 +2688,6 @@ function LogoInterpreter(turtle, stream, savehook) {
     if (plist) {
       plist['delete'](propname);
       if (plist.empty()) {
-        // TODO: Do this? Loses state, e.g. unburies if buried
         this.plists['delete'](plistname);
       }
     }
@@ -2937,7 +2918,6 @@ function LogoInterpreter(turtle, stream, savehook) {
     }
   });
 
-  // TODO: lots of redundant logic here -- clean this up
   def(language[133], function() {
     this.routines.keys().filter(function(x) {
       return !this.routines.get(x).primitive && !this.routines.get(x).buried;
@@ -3033,7 +3013,6 @@ function LogoInterpreter(turtle, stream, savehook) {
     // Bury variables
     if (list.length) {
       var vars = lexpr(list.shift());
-      // TODO: global only?
       this.scopes.forEach(function(scope) {
         vars.forEach(function(name) {
           name = sexpr(name);
