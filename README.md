@@ -1,4 +1,5 @@
-# NostecLogo - Logo kalbos interpretatorius, veikiantis su Node.js karkasu.
+# NostecLogo
+NostecLogo - Logo kalbos interpretatorius, veikiantis su Node.js karkasu.
 
 Norėdami pasileisti projektą lokaliai, visų pirma atsisiųskite Node.js į savo kompiuterį.
 Atsisųskite projektą ir išpakuokite jį į pasirinktą aplanką kompiuteryje.
