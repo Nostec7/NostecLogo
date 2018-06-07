@@ -14,24 +14,20 @@ var logo, turtle;
 
 // Later scripts may override this to customize the examples.
 // Leave it exposed as a global.
-var examples = './javascripts/data/examples-en.txt';
+var examples = './javascripts/data/examples-lt.txt';
 
 var currLang = getCookie("language");
 if(currLang == 'English'){
-  examples = './javascripts/data/examples-en.txt';
+  examples = './javascripts/data/examples-lt.txt';
 } else if(currLang == "Lietuviu"){
   examples = './javascripts/data/examples-lt.txt';
 }
 
-
 var msg1 = 'Clear library: Are you sure?';
-
-
 
 //
 // Storage hooks
 //
-// TODO: Replace these with events and/or data binding/observers
 
 function hook(orig, func) {
   return function() {
@@ -266,7 +262,7 @@ function initInput() {
       }).then(function() {
         document.body.classList.remove('running');
       }).then(function(){
-          clearInterval(movingTurtleLoop); //FIXME  version history here
+          clearInterval(movingTurtleLoop);
           movingTurtleLoop = setInterval(function(){
               if(isTurtleMoving) {
 

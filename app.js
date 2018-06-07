@@ -18,7 +18,7 @@ var app = express();
 app.use(express.static('public'));
 app.use(express.static('files'));
 app.use('/public', express.static(__dirname + "/public"));
-app.use('/images', express.static(__dirname +'/images')); // VEIKIA - ikelia images
+app.use('/images', express.static(__dirname +'/images'));
 app.use('/javascripts', express.static(__dirname +'/javascripts'));
 
 
@@ -55,6 +55,9 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+
+
 
 
 module.exports = app;

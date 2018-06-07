@@ -1,0 +1,4 @@
+student student
+mokinys mokinys
+svečias svečias
+vartotojas vartotojas

@@ -114,6 +114,10 @@ function createNewTask(){
     }
     setButton.onclick = function() {
        // alert(nameTextArea.value);
+        if(nameTextArea.value == ""){
+            alertCustomMessage("Pavadinimo laukas yra tuščias.");
+            return;
+        }
 
         AddTask(nameTextArea.value, contentTextArea.value);
 
@@ -144,6 +148,7 @@ function AddTask(name, description){
 
 function insertTask(name, description, parent, images){
     var taskImages = images;
+    //alert(taskImages.src);
         var snippet;
         snippet = document.createElement('div');
         snippet.className = 'snippet';

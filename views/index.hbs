@@ -21,11 +21,49 @@
 
 <link rel="stylesheet" href="./javascripts/cm/logo.css">
 
-<body class="single" onload="showStartingPage()">
+<body class="single" onload="checkAuth(); loadTasks();">
+
+
+<div id="register-screen" style="display:none;">
+    <div id="authentification-data-holder2">
+        <div id="auth-data-container2">
+            <h1 class="auth-text auth-text-head" id="login-register-heading2">Registruokitės</h1>
+            <h3 class="auth-text auth-text-plain">Vartotojo vardas</h3>
+            <input type="text" class="auth-text auth-input-field" id="username-field-reg">
+            <h3 class="auth-text auth-text-plain">Slaptažodis</h3>
+            <input type="password" class="auth-text auth-input-field" id="password-field-reg">
+            <h3> </h3>
+            <button type="button" class="auth-button auth-button-1" onclick="registerAsStudent()">Registruotis kaip studentas</button>
+            <h3></h3>
+            <button type="button" class="auth-button auth-button-2" onclick="registerAsTeacher()">Registruotis kaip mokytojas</button>
+        </div>
+    </div>
+</div>
+
+<div id="login-screen">
+    <div id="authentification-data-holder">
+        <div id="auth-data-container">
+            <h1 class="auth-text auth-text-head" id="login-register-heading">Prisijunkite</h1>
+            <h3 class="auth-text auth-text-plain">Vartotojo vardas</h3>
+            <input type="text" class="auth-text auth-input-field" id="username-field">
+            <h3 class="auth-text auth-text-plain">Slaptažodis</h3>
+            <input type="password" class="auth-text auth-input-field" id="password-field">
+            <h3> </h3>
+            <button type="button" class="auth-button auth-button-1" onclick="loginAsStudent()">Prisijungti kaip studentas</button>
+            <h3></h3>
+            <button type="button" class="auth-button auth-button-2" onclick="loginAsTeacher()">Prisijungti kaip mokytojas</button>
+            <h3></h3>
+            <button type="button" class="auth-button auth-button-3" onclick="registerBegin()">Neturite anketos? Registruokitės</button>
+        </div>
+    </div>
+</div>
 
 
 <div id="display-panel" class="panel">
 
+    <div id="VersionHistory">
+
+    </div>
     <div id="display">
         <div class="inner">
             <canvas id="sandbox" width="450" height="250">
@@ -105,13 +143,12 @@
             <span id="settingsTooltip" class="tooltiptext">Nustatymai</span>
         </button>
 
-
 </div>
 
     <div class="container" id="sidebar">
         <!-- main tabs on sidebar -->
         <div id="TasksTab" class="tab" > <!-- use # or $ to find history or library elements in index -->
-            <h2 id="TasksTabText">Užduotys</h2>
+            <h2 id="welcome-message-inmenu">Sveiki, vartotojas</h2>
             <div id="Tasks" style="position: relative;"></div>
             <h3 id="TasksTabText">Šiandienos užduotys:</h3>
             <div id="list-of-tasks"></div>
@@ -121,7 +158,7 @@
 
             <hr id="separatorTasks">
             <button class="button" data-l10n-id="extras-download-drawing" id="screenshot">Atsisiųsti paveikslą</button>
-
+            <button class="button" id="logout-button" onclick="logout()">Atsijungti</button>
 
 
         </div>
@@ -478,6 +515,14 @@
 
                 </samp>
 
+
+                <h3 class="small">Apie programą</h3>
+                <hr>
+                <p>Autorius: Paulius Legeckas</p>
+                    <a href="https://github.com/Nostec7/NostecLogo">Programos kodas</a>
+
+
+
                 </dl>
                 </p>
             </div>
@@ -544,9 +589,7 @@
 
     </div>
 
-<div id="VersionHistory">
 
-</div>
 <button id="version-history-toggle" value="down" style="font-weight: bold" onclick="toggleVersionHistoryWindow()">&#8681;</button>
 
 <!-- The Modal Menus-->
@@ -836,29 +879,291 @@
 
 
 <script>
-    function showStartingPage() {
+
+    function checkForExistingUser(username,  password, type) {
+
+        if(username.length == 0){
+            alertCustomMessage("Prašome įvesti vartotojo vardą.");
+            return;
+        }
+        if(password == ""){
+            alertCustomMessage("Prašome įvesti slaptažodį.");
+            return;
+        }
+
+        var rawFile = new XMLHttpRequest();
+        var userFound = false;
 
 
-        //document.getElementById("display-panel").style.display = 'none';
-        //document.getElementById("VersionHistory").style.display = 'none';
-        //document.getElementById("version-history-toggle").style.display = 'none';
-        //document.getElementById("input-panel").style.display = 'none';
+        if(type == "student") {
+            rawFile.open("GET", "/javascripts/data/users/users-student.txt", true);
+            rawFile.onreadystatechange = function () {
+                if (rawFile.readyState === 4) {
+                    var allText = rawFile.responseText;
+                    var arrayOfLines = allText.match(/[^\r\n]+/g);
+                    for (var i = 0; i < arrayOfLines.length; i++) {
+                        var userData = arrayOfLines[i].split(" ");
+                        if (userData[0].toLowerCase() == username.toLowerCase() && userData[1] == password) {
+                            setCookie("auth", "true");
+                            setCookie("login-type", "student");
+                            var loginScreen = document.getElementById("login-screen");
+                            loginScreen.style.display = "none";
+                            var uploadTaskButton = document.getElementById("in-panel-tasks-button");
+                            uploadTaskButton.style.display = "none";
+                            document.getElementById("welcome-message-inmenu").innerHTML = "Sveiki, " + username;
+                            userFound = true;
+                        }
+                    }
+                    if(userFound == false){
+                        clearInputFields();
+                        alertCustomMessage("Toks mokinys nerastas, bandykite dar kartą.");
+
+                    }
+                }
+            }
+        } else if(type == "teacher") {
+            rawFile.open("GET", "/javascripts/data/users/users-teacher.txt", true);
+            rawFile.onreadystatechange = function () {
+                if (rawFile.readyState === 4) {
+                    var allText = rawFile.responseText;
+                    var arrayOfLines = allText.match(/[^\r\n]+/g);
+                    for (var i = 0; i < arrayOfLines.length; i++) {
+                        var userData = arrayOfLines[i].split(" ");
+                        if (userData[0].toLowerCase() == username.toLowerCase() && userData[1] == password) {
+                            setCookie("auth", "true");
+                            setCookie("login-type", "teacher");
+                            var loginScreen = document.getElementById("login-screen");
+                            loginScreen.style.display = "none";
+                            var uploadTaskButton = document.getElementById("in-panel-tasks-button");
+                            uploadTaskButton.style.display = "block";
+                            document.getElementById("welcome-message-inmenu").innerHTML = "Sveiki, " + username;
+                            userFound = true;
+                        }
+                    }
+                    if(userFound == false){
+                        clearInputFields();
+                        alertCustomMessage("Toks mokytojas nerastas, bandykite dar kartą.");
+                    }
+                }
+            }
+
+        }
+        rawFile.send();
+    }
+
+    function registerAsStudent(){
+        var username = document.getElementById("username-field-reg").value;
+        var password = document.getElementById("password-field-reg").value;
+        if(username.length == 0){
+            alertCustomMessage("Prašome įvesti vartotojo vardą.");
+            return;
+        }
+        if(password.length == 0){
+            alertCustomMessage("Prašome įvesti slaptažodį.");
+            return;
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", '/register-student', true);
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+        xhr.onreadystatechange = function() {//Call a function when the state changes.
+            if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+                // Request finished. Do processing here.
+                var txt = xhr.responseText;
+                //console.log(txt);
+            }
+        }
+        console.log(password);
+        var dataToSend = "username="+username+"&password="+password;
+        xhr.send(dataToSend);
+        alertCustomMessage("Mokinio registracija sėkminga. Prašome prisijungti");
+        document.getElementById("register-screen").style.display="none";
+    }
+
+    function registerAsTeacher(){
+        var username = document.getElementById("username-field-reg").value;
+        var password = document.getElementById("password-field-reg").value;
+        if(username.length == 0){
+            alertCustomMessage("Prašome įvesti vartotojo vardą.");
+            return;
+        }
+        if(password.length == 0){
+            alertCustomMessage("Prašome įvesti slaptažodį.");
+            return;
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", '/register-teacher', true);
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+        xhr.onreadystatechange = function() {//Call a function when the state changes.
+            if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+                // Request finished. Do processing here.
+                var txt = xhr.responseText;
+                //console.log(txt);
+            }
+        }
+        console.log(password);
+        var dataToSend = "username="+username+"&password="+password;
+        xhr.send(dataToSend);
+        alertCustomMessage("Mokytojo registracija sėkminga. Prašome prisijungti");
+        document.getElementById("register-screen").style.display="none";
+    }
+
+    function loginAsStudent(){
+
+        var username = document.getElementById("username-field").value;
+        var password = document.getElementById("password-field").value;
+        var access = false;
+        checkForExistingUser(username, password, "student");
 
 
     }
+    function loginAsTeacher(){
 
-    /*function createNewTask(){
+        var username = document.getElementById("username-field").value;
+        var password = document.getElementById("password-field").value;
+        checkForExistingUser(username, password, "teacher");
+    }
+    function registerBegin(){
+        var registerScreen = document.getElementById("register-screen");
+        registerScreen.style.display = "block";
+    }
+    function registerEnd(){
 
-        //createNewTask();
+
+        setCookie("auth", "true");
+        checkAuth();
+    }
 
 
-        document.getElementById("create-task-menu").style.display = 'block';
-        document.getElementById("loading-overlay").style.display = 'block';
-        document.getElementById("overlay-number").innerHTML = "0%";
-        //saveTeachersCanvas('teachers');
 
-    }*/
+    function dostuff(){
+        alert("dostuff");
+    }
 
+
+    function checkAuth(){
+
+        var authLoginScreen = document.getElementById("login-screen");
+        var authRegisterScreen = document.getElementById("register-screen");
+        var auth = getCookie("auth");
+        if(auth == "true"){
+            authLoginScreen.style.display="none";
+            authRegisterScreen.style.display="none";
+
+            if(getCookie("login-type") == "student"){
+                var uploadTaskButton = document.getElementById("in-panel-tasks-button");
+                uploadTaskButton.style.display = "none";
+            } else if(getCookie("login-type") == "teacher"){
+                var uploadTaskButton = document.getElementById("in-panel-tasks-button");
+                uploadTaskButton.style.display = "block";
+            }
+        }
+    }
+    function logout(){
+        setCookie("auth", "false");
+        setCookie("login-type", "none");
+        var loginScreen = document.getElementById("login-screen");
+        loginScreen.style.display = "block";
+
+        clearInputFields();
+        location.reload();
+    }
+    function clearInputFields(){
+        document.getElementById("password-field").innerHTML = "";
+        document.getElementById("username-field").innerHTML = "";
+        document.getElementById("password-field-reg").innerHTML = "";
+        document.getElementById("username-field-reg").innerHTML = "";
+
+    }
+
+    function writeTaskToDB(taskName, taskDescription, taskImagesData){
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", '/upload-task', true);
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+        xhr.onreadystatechange = function() {//Call a function when the state changes.
+            if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+                // Request finished. Do processing here.
+                var txt = xhr.responseText;
+            }
+        }
+        var dataToSend = "taskname="+taskName+"&description="+taskDescription;
+        xhr.send(dataToSend);
+
+        for(var i = 0; i < taskImagesData.length; i++){
+            xhr = new XMLHttpRequest();
+            xhr.open("POST", '/upload-task-images', true);
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+            xhr.onreadystatechange = function() {//Call a function when the state changes.
+                if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+                    var txt = xhr.responseText;
+                }
+            }
+            dataToSend = "taskname="+taskName+"&imagedata="+taskImagesData[i];
+            xhr.send(dataToSend);
+        }
+    }
+
+    function loadTasks() {
+
+        var imagesToLoad = [];
+        var parentTab = document.getElementById("list-of-tasks");
+
+
+        var rawFile = new XMLHttpRequest();
+        rawFile.open("GET", "/javascripts/data/tasks/sinusoide.txt", true);
+        rawFile.onreadystatechange = function () {
+            if (rawFile.readyState === 4) {
+
+                var lines = rawFile.responseText.split('\n');
+                console.log(lines);
+
+                var taskName = lines[0];
+                var taskDescription = lines[1];
+
+
+               /* for(var i = 2; i < lines.length; i++){
+                    var img = new Image();
+                    img.src = lines[i];
+                    imagesToLoad.push(img);
+                }*/
+                //console.log(imagesToLoad);
+
+               // console.log(rawFile.responseText);
+
+                /*
+                var allText = rawFile.responseText;
+                var arrayOfLines = allText.match(/[^\r\n]+/g);
+                for (var i = 0; i < arrayOfLines.length; i++) {
+                    var userData = arrayOfLines[i].split(" ");
+                    if (userData[0].toLowerCase() == username.toLowerCase() && userData[1] == password) {
+                        setCookie("auth", "true");
+                        setCookie("login-type", "student");
+                        var loginScreen = document.getElementById("login-screen");
+                        loginScreen.style.display = "none";
+                        var uploadTaskButton = document.getElementById("in-panel-tasks-button");
+                        uploadTaskButton.style.display = "none";
+                        document.getElementById("welcome-message-inmenu").innerHTML = "Sveiki, " + username;
+                        userFound = true;
+                    }
+                }
+                if(userFound == false){
+                    clearInputFields();
+                    alertCustomMessage("Toks mokinys nerastas, bandykite dar kartą.");
+
+                }*/
+                //}
+            }
+
+
+            //insertTask("uzd1", "nu va aprasymas", parentTab, imagesToLoad);
+        }
+        rawFile.send();
+    }
 
 </script>
 

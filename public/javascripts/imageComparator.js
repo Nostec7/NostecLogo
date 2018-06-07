@@ -3,13 +3,13 @@
  */
 
 var multipleTeacherImages = true;
-var numberOfTeachersImages = 20; //
+var numberOfTeachersImages = 30; //
 var taskImages = [];
 var croppedTaskImages = [];
 var taskName;
 var taskDescription;
 var canvasCurr = document.querySelector('#sandbox'); // current canvas
-var imageComparingTreshold = 85; //Percentage of comparison in pixel equality
+var imageComparingTreshold = 60; //Percentage of comparison in pixel equality
 var teachersTaskImages = []; //TODO: make this double array so that first index could be [taskNr] and second [taskImage]. 1 taskNr has 359 taskImages
 var pictureIndex = 0;
 var matchFailCounter = 0;
@@ -284,7 +284,7 @@ function compareImages(croppedTeachersCanvas, croppedStudentsCanvas){
         }
     }
     if(!found){
-        alertCustomMessage('Deja, kažkas atlikta neteisingai.');
+        alertCustomMessage('Deja, užduotis išspręsta neteisingai.');
     }
 }
 
@@ -412,12 +412,20 @@ function createCanvasFromImage(versionName, callback, degreesToRotate){
     return img1;
 }
 
-function cropAndSaveCanvas(versionName, canvas, img1){
+var taskImageDataArr = [];
 
+function cropAndSaveCanvas(versionName, canvas, img1){
     var croppedTeachersCanvas = cropImage(canvas, img1);
 
     var tempTaskImg = new Image();
     tempTaskImg.src = croppedTeachersCanvas.toDataURL();
+
+    //something with ecnoding/decoding does not work
+    var dataUrl = croppedTeachersCanvas.toDataURL("image/jpeg").replace(/^data:image\/(png|jpg|jpeg);base64,/, "").replace(" ", "");
+
+    taskImageDataArr.push(dataUrl);
+
+
 
     taskImages.push(tempTaskImg);
 
@@ -437,6 +445,7 @@ function cropAndSaveCanvas(versionName, canvas, img1){
 
     var completionPercentage = Math.round(pictureIndex / numberOfTeachersImages * 100);
     var completionPercentageText = "" + completionPercentage + "%";
+
     document.getElementById("overlay-number").innerHTML = completionPercentageText;
     if(pictureIndex == numberOfTeachersImages){
         setTimeout(function(){
@@ -444,12 +453,16 @@ function cropAndSaveCanvas(versionName, canvas, img1){
             var tasksTab = document.getElementById("TasksTab");
 
             var taskTab = document.getElementById("list-of-tasks");
+            console.log(taskImages);
             insertTask(taskName, taskDescription, taskTab, taskImages);
             alertCustomMessage('Užduotis sėkmingai įkelta.');
+            console.log(taskImageDataArr);
 
+            writeTaskToDB(taskName, taskDescription, taskImageDataArr);
         }, 300);
     }
 }
+
 
 
 function loadCanvasLocally(versionName){
@@ -462,7 +475,6 @@ function loadCanvasLocally(versionName){
     } else{
         dataURL = versionHistory[versionName]; // new one
     }
-
     var img = new Image;
     img.src = dataURL;
     img.onload = function () {
@@ -476,8 +488,5 @@ function loadCanvasLocally(versionName){
         lastVersionInHistory = canvasCurr.toDataURL();
         //localStorage.setItem('lastversion', canvasCurr.toDataURL());
     };
-
-
-    //saveCanvasLocally(versionName);
 }
 

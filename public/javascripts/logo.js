@@ -2441,7 +2441,6 @@ function LogoInterpreter(turtle, stream, savehook) {
 
   def([language[70], language[71], language[72]], function(color) {
     turtle.color = parseColor(color);
-    //alert(color);
   });
 
 

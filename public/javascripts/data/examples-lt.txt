@@ -66,14 +66,20 @@ dš 90
 taškas
 rodykle 50 
 
-tai kvadratai :length
-  kartok 4 [ pr :ilgis dš 90 ]
+tai sinusoide1
+ppsp [0 0 30]
+kartok 360 [eik.x.y 
+(sin(254 * kartojimai)) 
+* 150 (sin(201 * kartojimai)) *
+ 150] 
 taškas
-tai betkokiaspalva
-  setcolor pick [ red orange yellow green blue violet ]
+sinusoide1
+
+tai sinusoide2
+ppsp [0 15 0]
+kartok 360 [eik.x.y (sin(327 * kartojimai)) * 150 (sin(66 * kartojimai)) * 150]
 taškas
-vvl
-kartok 36 [ betkokiaspalva kvadratas bet.koks 200 dš 10 ]
+sinusoide2
 
 tai papartis :dydis :ženklas
   jeigu :dydis < 1 [ baik ]
@@ -84,5 +90,4 @@ tai papartis :dydis :ženklas
   dš 7 * :ženklas papartis :dydis - 1 :ženklas kr 7 * :ženklas
   at :dydis * 2
 taškas
-vvl es at 150 pš
 papartis 25 1
