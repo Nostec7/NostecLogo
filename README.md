@@ -9,7 +9,7 @@ Tuomet įvykdykite komandas:
 npm install
 ````
 ````
-npm (missing modules)
+npm install (missing modules)
 ````
 Tuomet norėdami paleisti programą įvykdykite komandą
 ````
