@@ -16,4 +16,7 @@ Tuomet norėdami paleisti programą įvykdykite komandą
 npm start
 ````
 Jei port'as yra užimtas, atsidarykite www failą esantį bin folderyje su teksto editoriumi ir pakeiskite eilutėje
-var port = normalizePort(process.env.PORT || '8099'); skaičių 8099 į kokį nors kitą (pvz. 8010)
+
+var port = normalizePort(process.env.PORT || '8099'); 
+
+skaičių 8099 į kokį nors kitą (pvz. 8010)
