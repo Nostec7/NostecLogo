@@ -9,7 +9,7 @@ Tuomet įvykdykite komandas:
 npm install
 ````
 ````
-npm install (missing modules)
+npm install -g nodemon
 ````
 Tuomet norėdami paleisti programą įvykdykite komandą
 ````
